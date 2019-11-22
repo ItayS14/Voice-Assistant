@@ -14,16 +14,17 @@ def calculate(num1,op,num2,base=10):
     if type(num1) not in [int,float] or type(num2) not in [int,float] or type(op) != str:
         raise TypeError("Can't perform operation (Invalid types)!")
     parser = Parser() 
-    res = 0
+    exp = ""
     if op in ONE_PARAM_OPS:
         # Ignore the second number and use the base instead
         if op == 'log':
-            res = parser.parse(str(op) + "(" + str(num1) +"," + str(base) +")")
+            exp = f"{op}({num1},{base})"
         else:
-            res = parser.parse(str(op) + "(" + str(num1) + ")")
+            exp = f"{op}({num1})"
     else:
         if num2 == None:
-            raise TypeError("Num 2 can't be None!")
-        res =  parser.parse(str(num1) + " " + op + str(num2))
+            raise TypeError("Too few arguments!")
+        exp =  f"{num1} {op} {num2}"
     # Currently, does not support equations.
-    return res.evaluate({})
+    return parser.parse(exp).evaluate({})
+
