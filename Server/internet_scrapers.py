@@ -1,15 +1,17 @@
 import wikipedia
 from wikipedia.exceptions import DisambiguationError
+import requests
 
 class NoReusltsFound(Exception):
     """Raised when there is no results from keyowrd search in wikipedia"""
     pass
 
+
 def wiki_search(keyword):
     """
     The function will search for keyword in wikipedia
     :param keyword: keyword to search (str)
-    :return: dictionary 
+    :return: the title of the page and the summary (dictionary)
     """
 
     SENTENCES_COUNT = 2
@@ -32,3 +34,24 @@ def wiki_search(keyword):
             continue
     
     raise NoReusltsFound
+
+
+def coin_exchange(from_coin, to_coin, amount=1):
+    """
+    The function will exchange coins with real time exchange rate
+    :param from_coin: the currency code to exchange from (str)
+    :param to_coin: the currency code to exchange to
+    :param amount: the amount to exchange (1 by defult - which returns the rate of a coin)
+    :return: the amount in the requested coin (dictionary)
+    """
+
+    API_URL = r"https://api.exchangerate-api.com/v4/latest/"
+
+    response = requests.get(f'{API_URL}/{from_coin}')
+    data = response.json()
+    rate = data["rates"][to]
+
+    return {
+        "amount" : rate*amount,
+        "currency" : to
+            }
