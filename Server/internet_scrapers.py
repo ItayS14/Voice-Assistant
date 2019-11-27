@@ -6,6 +6,9 @@ class NoReusltsFound(Exception):
     """Raised when there is no results from keyowrd search in wikipedia"""
     pass
 
+class InvalidCurrencyCode(Exception):
+    """Raised when one of the parameters for coin_exchange function is an invalid code"""
+    pass
 
 def wiki_search(keyword):
     """
@@ -48,10 +51,17 @@ def coin_exchange(from_coin, to_coin, amount=1):
     API_URL = r"https://api.exchangerate-api.com/v4/latest/"
 
     response = requests.get(f'{API_URL}/{from_coin}')
+    if not response.ok: #if there was error in the resonse (if from_coin was not valid)
+        raise InvalidCurrencyCode
     data = response.json()
-    rate = data["rates"][to]
+
+    to_coin = to_coin.upper() 
+    if "result" in data.keys() or to_coin not in data["rates"].keys(): #invalid from_coin or to_coin
+        raise InvalidCurrencyCode
+    
+    rate = data["rates"][to_coin]
 
     return {
         "amount" : rate*amount,
-        "currency" : to
+        "currency" : to_coin
             }
