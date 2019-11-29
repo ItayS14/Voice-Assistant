@@ -21,7 +21,7 @@ class Device(db.Model):
     name = db.Column(db.String(30), nullable=False)
     device_type_id = db.Column(db.Integer) # Maybe need to convert this to db.ForeignKey
     options = db.Column(db.String(100)) 
-    house_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    house_id = db.Column(db.Integer, db.ForeignKey('house.id'), nullable=False)
     def __repr__(self):
         return f"Device('{self.device_name}', Type: {self.device_type_id})"
 
@@ -36,7 +36,7 @@ class House(db.Model):
         return f"House('{self.name}', Devices: {self.devices}, Users: {self.users})"
 
 class DeviceType(db.Model):
-    id = db.column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     def __repr__(self):
         return f"DeviceType({self.device_type_id})"
