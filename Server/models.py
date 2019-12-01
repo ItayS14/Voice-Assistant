@@ -1,9 +1,5 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
+from Server import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -22,6 +18,7 @@ class Device(db.Model):
     device_type_id = db.Column(db.Integer) # Maybe need to convert this to db.ForeignKey
     options = db.Column(db.String(100)) 
     house_id = db.Column(db.Integer, db.ForeignKey('house.id'), nullable=False)
+   
     def __repr__(self):
         return f"Device('{self.device_name}', Type: {self.device_type_id})"
 
@@ -35,9 +32,11 @@ class House(db.Model):
     def __repr__(self):
         return f"House('{self.name}', Devices: {self.devices}, Users: {self.users})"
 
+
 class DeviceType(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50), nullable=False)
+    
     def __repr__(self):
         return f"DeviceType({self.device_type_id})"
 
@@ -47,7 +46,4 @@ class Command(db.Model):
     command_words = db.Column (db.String(5000)) # All the words that can describe the command, as a list
     
     def __repr__(self):
-        return f"Command('{self.index}': {command_words})"
-
-if __name__ == '__main__':
-    db.create_all()
+        return f"Command('{self.index}': {self.command_words})"
