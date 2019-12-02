@@ -13,7 +13,7 @@ def validate_username(username):
     """
     # TODO: check that the username does not contain any symbols
     user = User.query.filter_by(username=username).first()
-    return user != None
+    return user is None
 
 
 def validate_email(email):
@@ -24,7 +24,7 @@ def validate_email(email):
     """
     # TODO: check that the email is a vaild email address
     email = User.query.filter_by(email=email).first()
-    return email != None
+    return email is None
 
 
 def validate_password(password):
