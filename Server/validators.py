@@ -38,7 +38,7 @@ def validate_password(password):
     :param password: the password to check (str)
     :return: does the password fit the standards or not (bool)
     """
-    if len(password) > MAX_PASSWORD_LEN or len(password) < MIN_PASSWORD_LEN:
+    if not(MIN_PASSWORD_LEN < len(password) < MAX_PASSWORD_LEN):
         return False
     lower = any(char.islower() for char in password)
     upper = any(char.isupper() for char in password)
