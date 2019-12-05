@@ -1,8 +1,9 @@
 from Server.models import User
-import re
+import string
+from validate_email import validate_email as email_validation
 
-MAX_LEN = 32
-MIN_LEN = 8
+MAX_PASSWORD_LEN = 32
+MIN_PASSWORD_LEN = 8
 
 
 def validate_username(username):
@@ -11,7 +12,9 @@ def validate_username(username):
     :param username: username to check (str)
     :return: is the user valid or not (bool)
     """
-    # TODO: check that the username does not contain any symbols
+    if any(char in string.punctuation for char in username):
+        return False
+
     user = User.query.filter_by(username=username).first()
     return user is None
 
@@ -22,7 +25,9 @@ def validate_email(email):
     :param username: username to check (str)
     :return: is the user valid or not (bool)
     """
-    # TODO: check that the email is a vaild email address
+    if not email_validation(email): # For now only checks the email format (later emaill verification will be sent)
+        return False
+
     email = User.query.filter_by(email=email).first()
     return email is None
 
@@ -33,7 +38,7 @@ def validate_password(password):
     :param password: the password to check (str)
     :return: does the password fit the standards or not (bool)
     """
-    if len(password) > MAX_LEN or len(password) < MIN_LEN:
+    if len(password) > MAX_PASSWORD_LEN or len(password) < MIN_PASSWORD_LEN:
         return False
     lower = any(char.islower() for char in password)
     upper = any(char.isupper() for char in password)
