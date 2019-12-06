@@ -59,11 +59,24 @@ def logout():
     return jsonify([True, {}])
 
 
-@app.route('/password_reset/<token>', methods=['POST'])
-def password_reset(token):
+@app.route("/reset_password", methods=['GET', 'POST'])
+def password_reset_request():
+    # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
-    user = User.verify_token(token, salt='PASSWORD_RESET')
+    email = request.form.get('email')
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+    return user.get_token('PASSWORD_RESET')
+
+
+@app.route('/password_reset/<token>', methods=['POST'])
+def password_reset(token):
+    # May need to add support for password change later
+    if current_user.is_authenticated:
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+    user = User.verify_token(token, 'PASSWORD_RESET')
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
     new_password = request.form.get('password')
