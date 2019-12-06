@@ -59,6 +59,18 @@ def logout():
     return jsonify([True, {}])
 
 
+def send_reset_email(user):
+    token = user.get_token('PASSWORD_RESET')
+    msg = Message('Password Reset Request',
+                  sender='noreply@carmelvoiceassistant.com',
+                  recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+{url_for('reset_token', token=token, _external=True)}
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
+
+
 @app.route("/reset_password", methods=['GET', 'POST'])
 def password_reset_request():
     # May need to add support for password change later
@@ -68,7 +80,8 @@ def password_reset_request():
     user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
-    return user.get_token('PASSWORD_RESET')
+    send_reset_email(user)
+    return jsonify([True, {}}])
 
 
 @app.route('/password_reset/<token>', methods=['POST'])
@@ -82,7 +95,7 @@ def password_reset(token):
     new_password = request.form.get('password')
     hashed_password = bcrypt.generate_password_hash(
         new_password).decode('utf-8')
-    user.password = hashed_password
+    user.password=hashed_password
     db.session.commit()
     return jsonify([True, {}}])
 
