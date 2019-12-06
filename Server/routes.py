@@ -25,7 +25,7 @@ def register():
         return jsonify([True, {}])
 
     # add custom error msg later
-    return jsonify([False, ProtocolErrors.PARAMETERS_DOES_NOT_MATCH_REQUIREMENTS.value])
+    return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
 
 @app.route('/login', methods=['POST'])
@@ -57,6 +57,21 @@ def logout():
     # A flask-login function that disconnects the user
     logout_user()
     return jsonify([True, {}])
+
+
+@app.route('/password_reset/<token>', methods=['POST'])
+def password_reset(token):
+    if current_user.is_authenticated:
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+    user = User.verify_token(token, salt='PASSWORD_RESET')
+    if user is None:
+        return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
+    new_password = request.form.get('password')
+    hashed_password = bcrypt.generate_password_hash(
+        new_password).decode('utf-8')
+    user.password = hashed_password
+    db.session.commit()
+    return jsonify([True, {}}])
 
 
 # NOTE: how should we use the is_active method for current_user?
