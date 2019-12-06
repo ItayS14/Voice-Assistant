@@ -93,11 +93,13 @@ def password_reset(token):
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
     new_password = request.form.get('password')
-    hashed_password = bcrypt.generate_password_hash(
-        new_password).decode('utf-8')
-    user.password=hashed_password
-    db.session.commit()
-    return jsonify([True, {}}])
+    if validate_password(new_password):
+        hashed_password = bcrypt.generate_password_hash(
+            new_password).decode('utf-8')
+        user.password=hashed_password
+        db.session.commit()
+        return jsonify([True, {}}])
+    return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
 
 # NOTE: how should we use the is_active method for current_user?
