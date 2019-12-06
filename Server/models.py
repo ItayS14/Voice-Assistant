@@ -29,7 +29,7 @@ class User(db.Model, UserMixin):
         # CHANGE THIS to our secret key later
         s = Serializer('SECRETKEY', 1800)  # Tokens last for 30 mins
         # Added salt because the tokens can be used for both password reset and email verification
-        return s.dumps({'user_id': self.id}, salt=salt).decode('utf-8')
+        return s.dumps({'user_id': self.id}, salt=salt)
 
     @staticmethod
     def verify_token(token, salt):

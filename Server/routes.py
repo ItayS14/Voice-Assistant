@@ -1,8 +1,9 @@
-from Server import app, db, bcrypt, ProtocolErrors
-from flask import request, jsonify
+from Server import app, db, bcrypt, ProtocolErrors, mail
+from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.validators import validate_username, validate_email, validate_password
+from flask_mail import Message
 
 
 @app.route('/register', methods=['POST'])
@@ -65,13 +66,13 @@ def send_reset_email(user):
                   sender='noreply@carmelvoiceassistant.com',
                   recipients=[user.email])
     msg.body = f'''To reset your password, visit the following link:
-{url_for('reset_token', token=token, _external=True)}
+{url_for('password_reset', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
     mail.send(msg)
 
 
-@app.route("/reset_password", methods=['GET', 'POST'])
+@app.route("/password_reset", methods=[ 'POST'])
 def password_reset_request():
     # May need to add support for password change later
     if current_user.is_authenticated:
@@ -81,7 +82,7 @@ def password_reset_request():
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
     send_reset_email(user)
-    return jsonify([True, {}}])
+    return jsonify([True, {}])
 
 
 @app.route('/password_reset/<token>', methods=['POST'])
@@ -96,9 +97,9 @@ def password_reset(token):
     if validate_password(new_password):
         hashed_password = bcrypt.generate_password_hash(
             new_password).decode('utf-8')
-        user.password=hashed_password
+        user.password = hashed_password
         db.session.commit()
-        return jsonify([True, {}}])
+        return jsonify([True, {}])
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
 
