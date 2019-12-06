@@ -65,6 +65,7 @@ def send_reset_email(user):
     msg = Message('Password Reset Request',
                   sender='noreply@carmelvoiceassistant.com',
                   recipients=[user.email])
+    # Direct the user to the password reset route (may need to change this to open the flutter app later)
     msg.body = f'''To reset your password, visit the following link:
 {url_for('password_reset', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
@@ -81,6 +82,7 @@ def password_reset_request():
     user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
     send_reset_email(user)
     return jsonify([True, {}])
 
@@ -90,16 +92,21 @@ def password_reset(token):
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+
     user = User.verify_token(token, 'PASSWORD_RESET')
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
+
+    
     new_password = request.form.get('password')
+    # Make sure that password is strong enough and create new hash
     if validate_password(new_password):
-        hashed_password = bcrypt.generate_password_hash(
-            new_password).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
+        user2 = User.query.filter_by(password=hashed_password)
         return jsonify([True, {}])
+        
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
 

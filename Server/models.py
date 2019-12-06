@@ -33,6 +33,12 @@ class User(db.Model, UserMixin):
 
     @staticmethod
     def verify_token(token, salt):
+        """
+        This function will verify that a certain token is valid and refers to a specific user
+        :param token: the token to check if valid (str)
+        :param salt: the salt to use while serializing (str)
+        :return: the user that the token refers to if it's valid (User) or None if it isn't (or the user id doesn't exist)
+        """
         s = Serializer('SECRETKEY', salt=salt)
         try:
             user_id = s.loads(token)['user_id']
@@ -74,8 +80,6 @@ class DeviceType(db.Model):
 
     def __repr__(self):
         return f"DeviceType({self.device_type_id})"
-
-# Implementation of this model might vastly change
 
 
 class Command(db.Model):

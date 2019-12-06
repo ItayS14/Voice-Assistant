@@ -8,7 +8,7 @@ def main():
 
     #print('Login: ', login(s, 'abc', 'asfdF123123411').text)
     #print('Request: ', request_reset_password(s,'jday.david.2002@gmail.com').text)
-    print('Reset: ', reset_password(s,'eyJ1c2VyX2lkIjoxfQ.XeqPBw.ZODG4SO9kGiQ8acGbptsAX3cOEU','213676231126378aA'))
+    print('Reset: ', reset_password(s,'eyJ1c2VyX2lkIjoxfQ.XeqPBw.ZODG4SO9kGiQ8acGbptsAX3cOEU','212456724716714256471asdf78aA'))
     #print('Logout: ', logout(s))
 
 
