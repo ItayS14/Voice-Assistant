@@ -56,7 +56,9 @@ def request_reset_password(s,email):
     :param s: The requests session (requests.Session)
     :return: requests.response
     """
-    data = {'email':email}
+    data = {
+        'email':email
+    }
     return s.post(SERVER_URL + "/password_reset",data)
 
 

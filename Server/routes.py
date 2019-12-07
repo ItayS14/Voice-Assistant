@@ -18,8 +18,7 @@ def register():
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
 
     if validate_username(username) and validate_email(email) and validate_password(password):
-        hashed_password = bcrypt.generate_password_hash(
-            password).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
         db.session.commit()
@@ -73,8 +72,8 @@ If you did not make this request then simply ignore this email and no changes wi
     mail.send(msg)
 
 
-@app.route("/password_reset", methods=[ 'POST'])
-def password_reset_request():
+@app.route("/get_password_reset_token", methods=['POST'])
+def get_password_reset_token():
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
@@ -104,7 +103,6 @@ def password_reset(token):
         hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        user2 = User.query.filter_by(password=hashed_password)
         return jsonify([True, {}])
         
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
