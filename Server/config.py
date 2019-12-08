@@ -8,3 +8,15 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+
+
+internet_scrappers = {
+    'SENTENCES_COUNT' : 2,
+    'EXCHANGE_API_URL' : r"https://api.exchangerate-api.com/v4/latest/"
+}
+
+
+calculator = {
+    'MAX_PASSWORD_LEN': 32,
+    'MIN_PASSWORD_LEN': 8
+}
