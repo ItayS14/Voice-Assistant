@@ -60,6 +60,10 @@ def logout():
 
 
 def send_reset_email(user):
+    """
+    The function will send reset email to user
+    :param user: The user to send the maill to (User class)
+    """
     token = user.get_token('PASSWORD_RESET')
     msg = Message('Password Reset Request',
                   sender='noreply@carmelvoiceassistant.com',
@@ -77,7 +81,11 @@ def get_password_reset_token():
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+   
     email = request.form.get('email')
+    if not email:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
     user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
@@ -92,12 +100,14 @@ def password_reset(token):
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
 
+    new_password = request.form.get('password')
+    if not new_password:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
     user = User.verify_token(token, 'PASSWORD_RESET')
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
 
-    
-    new_password = request.form.get('password')
     # Make sure that password is strong enough and create new hash
     if validate_password(new_password):
         hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
