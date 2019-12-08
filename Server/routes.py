@@ -1,8 +1,9 @@
-from Server import app, db, bcrypt, ProtocolErrors
-from flask import request, jsonify
+from Server import app, db, bcrypt, ProtocolErrors, mail
+from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.validators import validate_username, validate_email, validate_password
+from flask_mail import Message
 
 
 @app.route('/register', methods=['POST'])
@@ -17,15 +18,14 @@ def register():
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
 
     if validate_username(username) and validate_email(email) and validate_password(password):
-        hashed_password = bcrypt.generate_password_hash(
-            password).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         return jsonify([True, {}])
 
     # add custom error msg later
-    return jsonify([False, ProtocolErrors.PARAMETERS_DOES_NOT_MATCH_REQUIREMENTS.value])
+    return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
 
 @app.route('/login', methods=['POST'])
@@ -57,6 +57,65 @@ def logout():
     # A flask-login function that disconnects the user
     logout_user()
     return jsonify([True, {}])
+
+
+def send_reset_email(user):
+    """
+    The function will send reset email to user
+    :param user: The user to send the maill to (User class)
+    """
+    token = user.get_token('PASSWORD_RESET')
+    msg = Message('Password Reset Request',
+                  sender='noreply@carmelvoiceassistant.com',
+                  recipients=[user.email])
+    # Direct the user to the password reset route (may need to change this to open the flutter app later)
+    msg.body = f'''To reset your password, visit the following link:
+{url_for('password_reset', token=token, _external=True)}
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
+
+
+@app.route("/get_password_reset_token", methods=['POST'])
+def get_password_reset_token():
+    # May need to add support for password change later
+    if current_user.is_authenticated:
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+   
+    email = request.form.get('email')
+    if not email:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
+    send_reset_email(user)
+    return jsonify([True, {}])
+
+
+@app.route('/password_reset/<token>', methods=['POST'])
+def password_reset(token):
+    # May need to add support for password change later
+    if current_user.is_authenticated:
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+
+    new_password = request.form.get('password')
+    if not new_password:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
+    user = User.verify_token(token, 'PASSWORD_RESET')
+    if user is None:
+        return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
+
+    # Make sure that password is strong enough and create new hash
+    if validate_password(new_password):
+        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        return jsonify([True, {}])
+        
+    return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
 
 # NOTE: how should we use the is_active method for current_user?
