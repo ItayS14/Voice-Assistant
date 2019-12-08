@@ -43,9 +43,9 @@ def coin_exchange(from_coin, to_coin, amount=1):
     """
     The function will exchange coins with real time exchange rate
     :param from_coin: the currency code to exchange from (str)
-    :param to_coin: the currency code to exchange to
-    :param amount: the amount to exchange (1 by defult - which returns the rate of a coin)
-    :return: the amount in the requested coin (dictionary)
+    :param to_coin: the currency code to exchange to (str)
+    :param amount: the amount to exchange (1 by defult - which returns the rate of a coin - int or float)
+    :return: the amount in the requested coin (int)
     """
 
     API_URL = r"https://api.exchangerate-api.com/v4/latest/"
@@ -60,8 +60,4 @@ def coin_exchange(from_coin, to_coin, amount=1):
         raise InvalidCurrencyCode
     
     rate = data["rates"][to_coin]
-
-    return {
-        "amount" : rate*amount,
-        "currency" : to_coin
-            }
+    return rate*amount
