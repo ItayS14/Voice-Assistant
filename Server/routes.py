@@ -2,8 +2,10 @@ from Server import app, db, bcrypt, ProtocolErrors, mail
 from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
-from Server.validators import validate_username, validate_email, validate_password
+from Server.validators import *
 from flask_mail import Message
+import Server.internet_scrappers as internet_scrappers
+from Server.calculator import calculate
 
 
 @app.route('/register', methods=['POST'])
@@ -116,6 +118,35 @@ def password_reset(token):
         return jsonify([True, {}])
         
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
+
+
+@app.route('/exchange', methods=['GET'])
+@login_required
+def exchange():
+    amount = request.args.get('amount')
+    to_coin = request.args.get('to_coin')
+    from_coin = request.args.get('from_coin')
+
+    if not (amount and to_coin and from_coin):
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+    
+    try:
+        resualt = internet_scrappers.coin_exchange(from_coin, to_coin, float(amount))
+        return jsonify([True, resualt]) # For example: [True, 3]
+    except internet_scrappers.InvalidCurrencyCode: 
+        return jsonify([False, ProtocolErrors.INVALID_CURRENCY_CODE.value])
+    except ValueError: # If amount was not float value 
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])  
+
+
+@app.route('/search/<key>', methods=['GET'])
+@login_required
+def search(key):
+    try:
+        res = internet_scrappers.wiki_search(key)
+        return jsonify([True, res])
+    except internet_scrappers.NoReusltsFound: # There are no results for that key
+        return jsonify([False, ProtocolErrors.NO_RESULTS_FOUND.value])
 
 
 # NOTE: how should we use the is_active method for current_user?
