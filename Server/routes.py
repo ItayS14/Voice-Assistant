@@ -148,6 +148,7 @@ def search(key):
     except internet_scrappers.NoResultsFound: # There are no results for that key
         return jsonify([False, ProtocolErrors.NO_RESULTS_FOUND.value])
 
+
 @app.route('/translate', methods=['GET'])
 @login_required
 def translate():
@@ -157,6 +158,25 @@ def translate():
     res = internet_scrappers.translate(data,dest_lang)
     return jsonify([True, res])
     
+
+@app.route('/profile/<username>', methods=['GET'])
+@login_required
+def profile(username):
+    """
+    This function will return the profile details of a given user
+    :param username: the name of the user to check details for (str)
+    :return: the details of the user (json) or None
+    """
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify([False,ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
+    # Later, add this to support smart house devices and/or specific user settings
+    return jsonify([True,{
+        'username': user.username,
+        'email': user.email,
+        'image': user.profile_image
+    }])    
 
     
 
