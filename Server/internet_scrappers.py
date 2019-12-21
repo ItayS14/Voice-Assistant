@@ -4,7 +4,7 @@ import requests
 from googletrans import Translator
 from Server.config import internet_scrappers as settings
 
-class NoReusltsFound(Exception):
+class NoResultsFound(Exception):
     """Raised when there is no results from keyowrd search in wikipedia"""
     pass
 
@@ -57,6 +57,7 @@ def coin_exchange(from_coin, to_coin, amount=1):
     
     rate = data["rates"][to_coin]
     return rate*amount
+    
 def translate(text, dest_lang):
     """
     This function will translate the given text from one language to another
