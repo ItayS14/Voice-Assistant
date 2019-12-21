@@ -5,7 +5,7 @@ from googletrans import Translator
 from Server.config import internet_scrappers as settings
 
 class NoResultsFound(Exception):
-    """Raised when there is no results from keyowrd search in wikipedia"""
+    """Raised when there are no results from keyword search in wikipedia"""
     pass
 
 class InvalidCurrencyCode(Exception):
@@ -24,7 +24,7 @@ def wiki_search(keyword):
     search_results = wikipedia.search(title)
 
     if len(search_results) == 0:
-        raise NoReusltsFound
+        raise NoResultsFound
 
     for result in search_results: #getting the first result which is a real page 
         try:
@@ -35,7 +35,7 @@ def wiki_search(keyword):
         except DisambiguationError:
             continue
     
-    raise NoReusltsFound
+    raise NoResultsFound
 
 
 def coin_exchange(from_coin, to_coin, amount=1):
@@ -56,7 +56,7 @@ def coin_exchange(from_coin, to_coin, amount=1):
         raise InvalidCurrencyCode
     
     rate = data["rates"][to_coin]
-    return rate*amount
+    return rate * amount
     
 def translate(text, dest_lang):
     """
