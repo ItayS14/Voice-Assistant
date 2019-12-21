@@ -68,4 +68,4 @@ def translate(text, dest_lang):
           as supporting other languages would complicate the code massively.
     """
     translator = Translator()
-    return translator.translate(text,dest=dest_lang)
+    return translator.translate(text,dest=dest_lang).text
