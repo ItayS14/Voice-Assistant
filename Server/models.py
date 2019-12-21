@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
         :return: the token to use for the verification/reset (str)
         """
         # CHANGE THIS to our secret key later
-        s = Serializer('SECRETKEY', 1800)  # Tokens last for 30 mins
+        s = Serializer(app.config['SECRET_KEY'], 1800)  # Tokens last for 30 mins
         # Added salt because the tokens can be used for both password reset and email verification
         return s.dumps({'user_id': self.id}, salt=salt)
 
@@ -38,7 +38,7 @@ class User(db.Model, UserMixin):
         :param salt: the salt to use while serializing (str)
         :return: the user that the token refers to if it's valid (User) or None if it isn't (or the user id doesn't exist)
         """
-        s = Serializer('SECRETKEY', salt=salt)
+        s = Serializer(app.config['SECRET_KEY'], salt=salt)
         try:
             user_id = s.loads(token)['user_id']
         except:
