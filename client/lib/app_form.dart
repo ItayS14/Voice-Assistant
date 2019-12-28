@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+//forms for the login system
 class AppForm extends StatefulWidget {
   final String hint;
   final bool isPassword;

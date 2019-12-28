@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:client/login.dart';
+import 'package:client/register.dart';
+import 'package:client/forgot_password.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,6 +11,10 @@ class MyApp extends StatelessWidget{
       return MaterialApp(
         theme: ThemeData(primaryColor: Colors.black),
         home: LoginPage(),
+        routes: {
+          '/login' : (_) => LoginPage(),
+          '/register': (_) => RegisterPage(),
+        },
       );
     }
 }
