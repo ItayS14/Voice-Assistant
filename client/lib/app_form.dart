@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class AppForm extends StatefulWidget {
   final String hint;
   final bool isPassword;
+  final onSaved;
+  final validator;
 
-  AppForm({Key key, @required String this.hint, bool this.isPassword = false}) : super(key: key);
+  AppForm({Key key, @required this.hint, this.isPassword = false, this.onSaved, this.validator}) : super(key: key);
 
   @override
   AppFormState createState() => AppFormState();
@@ -27,6 +29,8 @@ class AppFormState extends State<AppForm> {
           child: Icon(_showForm ? Icons.visibility : Icons.visibility_off)) : null,
         labelText: widget.hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(4))),
+        onSaved: widget.onSaved,
+        validator: widget.validator,
     );
   }
 }

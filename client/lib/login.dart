@@ -3,6 +3,9 @@ import 'package:circular_check_box/circular_check_box.dart';
 import 'package:client/app_form.dart';
 import 'package:client/app_button.dart';
 import 'package:client/login_system_template.dart';
+import 'package:client/bottom_button.dart';
+import 'package:requests/requests.dart';
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -10,7 +13,9 @@ class LoginPage extends StatefulWidget{
 }
 
 class LoginPageState extends State<LoginPage> {
-  bool rememberMe = true;
+  final _formKey = GlobalKey<FormState>();
+  bool _rememberMe = true;
+  String _auth, _password;
 
   @override
   Widget build(BuildContext context){
@@ -22,24 +27,17 @@ class LoginPageState extends State<LoginPage> {
         Text('Login', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
         Text('Please login to continue using our app.', style: TextStyle(fontWeight: FontWeight.w300)),
         SizedBox(height: 20),
-        AppForm(
-          hint: "Username or Email",
-        ),
-        SizedBox(height: 20),
-        AppForm(
-          hint: 'Password',
-          isPassword: true,
-        ),
+        _buildForms(),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Row(children: <Widget>[
               CircularCheckBox(
-                value: rememberMe,
+                value: _rememberMe,
                 activeColor: Colors.black87,
                 onChanged: (bool value) {
                   setState(() {
-                    rememberMe = value;
+                    _rememberMe = value;
                 });},
               ),
               Text("Remember me")
@@ -49,21 +47,49 @@ class LoginPageState extends State<LoginPage> {
         SizedBox(height: 15),
         AppButton(
           text: 'Login', 
-          func: () {}
+          func: _login
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Don't have an account?", style: TextStyle(fontWeight: FontWeight.w300),),
-            FlatButton(
-              child: Text('Sign Up', style: TextStyle(color: Colors.blue),),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/register');
-              },
-            )
-          ]
-       )    
+        BottomButton(
+          text: "Don't have an account?", 
+          buttonText: 'Sign Up',
+          onPressed: () => Navigator.of(context).pushNamed('/register')
+        )
       ]
+    );
+  }
+
+  _login() async{
+    _formKey.currentState.save();
+    final res = await Requests.post('http://10.0.2.2:5000/login', body: {'auth': _auth, 'password': _password}, bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+    final data = res.json();
+    if (data[0]) // Action success
+    {
+      print('Logged in ');
+      final res = await Requests.post('http://10.0.2.2:5000/logout');
+      print('Logging out');
+      print(res.statusCode);
+    }
+    else
+      print('Error: $data');
+  }
+  //The function will build the forms for the login screen
+  Form _buildForms(){
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          AppForm(
+            hint: "Username or Email",
+            onSaved: (input) => _auth = input,
+          ),
+          SizedBox(height: 20),
+          AppForm(
+            hint: 'Password',
+            isPassword: true,
+            onSaved: (input) => _password = input,
+          )
+        ]
+      )
     );
   }
 }
