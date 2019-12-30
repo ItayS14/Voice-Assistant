@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:client/login.dart';
 import 'package:client/register.dart';
-import 'package:client/forgot_password.dart';
 
 void main() => runApp(MyApp());
 

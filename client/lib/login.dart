@@ -5,7 +5,7 @@ import 'package:client/app_button.dart';
 import 'package:client/login_system_template.dart';
 import 'package:client/bottom_button.dart';
 import 'package:requests/requests.dart';
-import 'dart:convert';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -58,20 +58,29 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  _login() async{
+  _login() async {
     _formKey.currentState.save();
-    final res = await Requests.post('http://10.0.2.2:5000/login', body: {'auth': _auth, 'password': _password}, bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+    final res = await Requests.post('http://10.0.2.2:5000/login', 
+    body: {
+      'auth': _auth, 
+      'password': _password
+    }, 
+    bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+
     final data = res.json();
+    print(data);
     if (data[0]) // Action success
     {
-      print('Logged in ');
-      final res = await Requests.post('http://10.0.2.2:5000/logout');
+      Alert(context: context, title: "Logged in", type: AlertType.success).show(); //For now
+      final res = await Requests.get('http://10.0.2.2:5000/logout');
       print('Logging out');
-      print(res.statusCode);
+      print(res.json());
     }
-    else
-      print('Error: $data');
+    else{
+      Alert(context: context, title: "Server Error", desc: '$data', type: AlertType.error).show(); //For now
+    }
   }
+
   //The function will build the forms for the login screen
   Form _buildForms(){
     return Form(
