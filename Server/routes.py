@@ -131,8 +131,8 @@ def exchange():
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
     
     try:
-        resualt = internet_scrappers.coin_exchange(from_coin, to_coin, float(amount))
-        return jsonify([True, resualt]) # For example: [True, 3]
+        result = internet_scrappers.coin_exchange(from_coin, to_coin, float(amount))
+        return jsonify([True, result]) # For example: [True, 3]
     except internet_scrappers.InvalidCurrencyCode: 
         return jsonify([False, ProtocolErrors.INVALID_CURRENCY_CODE.value])
     except ValueError: # If amount was not float value 
@@ -145,8 +145,40 @@ def search(key):
     try:
         res = internet_scrappers.wiki_search(key)
         return jsonify([True, res])
-    except internet_scrappers.NoReusltsFound: # There are no results for that key
+    except internet_scrappers.NoResultsFound: # There are no results for that key
         return jsonify([False, ProtocolErrors.NO_RESULTS_FOUND.value])
+
+
+@app.route('/translate', methods=['GET'])
+@login_required
+def translate():
+    data = request.args.get('data')
+    dest_lang = request.args.get('dest_lang')
+    # Can't think of a specific exception case currently, might need to add later
+    res = internet_scrappers.translate(data,dest_lang)
+    return jsonify([True, res])
+    
+
+@app.route('/profile/<username>', methods=['GET'])
+@login_required
+def profile(username):
+    """
+    This function will return the profile details of a given user
+    :param username: the name of the user to check details for (str)
+    :return: the details of the user (json) or None
+    """
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify([False,ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+
+    # Later, add this to support smart house devices and/or specific user settings
+    return jsonify([True,{
+        'username': user.username,
+        'email': user.email,
+        'image': user.profile_image
+    }])    
+
+    
 
 
 # NOTE: how should we use the is_active method for current_user?
