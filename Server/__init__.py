@@ -5,6 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from enum import Enum
+import spacy
 
 class ProtocolErrors(Enum):
     INVALID_PARAMETERS_ERROR, USER_ALREADY_LOGGED_ERROR, INVALID_CREDENTIALS_ERROR, USER_NOT_LOGGED_ERROR, PARAMETERS_DO_NOT_MATCH_REQUIREMENTS, INVALID_TOKEN, INVALID_CURRENCY_CODE, NO_RESULTS_FOUND = range(8)
@@ -15,5 +16,6 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 mail = Mail(app)
+nlp = spacy.load('en_core_web_sm')
 
 from Server import routes

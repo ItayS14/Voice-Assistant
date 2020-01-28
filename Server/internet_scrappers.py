@@ -3,14 +3,32 @@ from wikipedia.exceptions import DisambiguationError
 import requests
 from googletrans import Translator
 from Server.config import internet_scrappers as settings
+from Server import nlp
+
 
 class NoResultsFound(Exception):
     """Raised when there are no results from keyword search in wikipedia"""
     pass
 
+
 class InvalidCurrencyCode(Exception):
     """Raised when one of the parameters for coin_exchange function is an invalid code"""
     pass
+
+
+def nlp_wiki(text):
+    """
+    The function will parse wiki question and return the parameter from the text query
+    :param text: the query to parse (str - for now)
+    :return: the parameter (str)
+    """
+    doc = nlp(text)
+    for word in doc:
+        if word.pos_ == 'AUX':
+            return doc[word.i + 1:].text.replace('?', '')
+    r = [span.text for span in doc.noun_chunks] # In case that the sentence had no auxilary verbs grouping all noun chunks except the first one
+    return ' '.join(r[1:])    
+
 
 def wiki_search(keyword):
     """
@@ -58,6 +76,7 @@ def coin_exchange(from_coin, to_coin, amount=1):
     rate = data["rates"][to_coin]
     return rate * amount
     
+
 def translate(text, dest_lang):
     """
     This function will translate the given text from one language to another
