@@ -5,6 +5,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from Server.validators import *
 from flask_mail import Message
 import Server.internet_scrappers as internet_scrappers
+import Server.translate
 from Server.calculator import calculate
 
 
@@ -155,7 +156,7 @@ def translate():
     data = request.args.get('data')
     dest_lang = request.args.get('dest_lang')
     # Can't think of a specific exception case currently, might need to add later
-    res = internet_scrappers.translate(data,dest_lang)
+    res = Server.translate.translate(data,dest_lang)
     return jsonify([True, res])
     
 
