@@ -28,6 +28,20 @@ def nlp_wiki(text):
     r = [span.text for span in doc.noun_chunks] # In case that the sentence had no auxilary verbs grouping all noun chunks except the first one
     return ' '.join(r[1:])    
 
+def nlp_coin_exchange(text): #TODO: return currency code
+    """
+    The function will parse exchange query and return the parameters found
+    :param text: the query to parse (str - for now)
+    :return: dictionary dictionary that contains the parameters (from_coin, to_coin, _amoun) 
+    """
+    doc = nlp(text)
+    for noun in doc.noun_chunks: #root of the noun chunks will be always the currency
+        if doc[noun.root.i - 1].pos_ == 'NUM': # if there was a number before the currency it indicates that that's the part to exchange
+            from_c = noun.root
+            amount = doc[noun.root.i - 1]
+        else:
+            to_c = noun.root
+    return dict(from_coin=from_c, to_coin=to_c, amount=amount)
 
 def wiki_search(keyword):
     """
