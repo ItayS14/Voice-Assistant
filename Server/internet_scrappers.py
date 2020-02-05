@@ -2,7 +2,7 @@ import wikipedia
 from wikipedia.exceptions import DisambiguationError
 import requests
 from Server.config import internet_scrappers as settings
-from Server import nlp
+from Server import nlp, ProtocolErrors
 
 
 class NoResultsFound(Exception):
@@ -35,12 +35,16 @@ def nlp_coin_exchange(text): #TODO: return currency code
     :return: dictionary dictionary that contains the parameters (from_coin, to_coin, _amoun) 
     """
     doc = nlp(text)
+    from_c = amount = to_c = None
     for noun in doc.noun_chunks: #root of the noun chunks will be always the currency
-        if doc[noun.root.i - 1].pos_ == 'NUM': # if there was a number before the currency it indicates that that's the part to exchange
+        if noun.root.i > 0 and doc[noun.root.i - 1].pos_ == 'NUM': # if there was a number before the currency it indicates that that's the part to exchange
             from_c = noun.root
             amount = doc[noun.root.i - 1]
         else:
             to_c = noun.root
+    
+    if not (from_c and amount and to_c):
+        return ProtocolErrors.INVALID_PARAMETERS_ERROR
     return dict(from_coin=from_c, to_coin=to_c, amount=amount)
 
 def wiki_search(keyword):
