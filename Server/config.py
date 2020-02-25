@@ -1,5 +1,5 @@
 import os
-from Server.nlp import nlp_wiki, nlp_coin_exchange, nlp_translate
+
 
 class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
@@ -23,21 +23,21 @@ class ValidatorsSettings():
 
 class NLPSettings(): # Settings for the nlp module
     command_dict = {
-    'exchange': nlp_coin_exchange,
-    'translate': nlp_translate,
-    'say': nlp_translate,
-    'tell': nlp_wiki    
+    'exchange': 'nlp_coin_exchange',
+    'translate': 'nlp_translate',
+    'say': 'nlp_translate',
+    'tell': 'nlp_wiki'    
     }
     wh_dict = {
-        'what': nlp_wiki,
-        'who': nlp_wiki,
-        'where': nlp_wiki,
-        'which': nlp_wiki,
+        'what': 'nlp_wiki',
+        'who': 'nlp_wiki',
+        'where': 'nlp_wiki',
+        'which': 'nlp_wiki',
     }
     how_dict = {
-        'much': nlp_coin_exchange,
-        'many': nlp_coin_exchange, # might change
-        'does': nlp_wiki,
-        'do': nlp_translate 
+        'much': 'nlp_coin_exchange',
+        'many': 'nlp_coin_exchange', # might change
+        'does': 'nlp_wiki',
+        'do': 'nlp_translate' 
     }
     LANGUAGE_PATTERN = [{'LOWER': {'IN': ['to','in']}}, {'ENT_TYPE': {'IN': ['NORP','LANGUAGE']}}]
