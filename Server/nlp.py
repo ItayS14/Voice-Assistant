@@ -1,5 +1,6 @@
 from Server import ProtocolErrors, nlp
 from Server.config import NLPSettings as Settings
+from spacy.matcher import Matcher
 
 class NotSupportedCommand(Exception):
     pass
@@ -13,12 +14,12 @@ def parse(text):
     """
     doc = nlp(text) # Maybe disable some pipes later
     first_token = doc[0].lower_
-    if doc[-1].text == '?' or first_token in wh_dict.keys():
+    if doc[-1].text == '?' or first_token in Settings.wh_dict.keys():
         return (globals()[Settings.wh_dict[first_token]], doc)
     if first_token == 'how':
         return (globals()[Settings.how_dict[doc[1].text]], doc)
     # Checking if the first word is a VERB might not work
-    if first_token not in command_dict.keys():
+    if first_token not in Settings.command_dict.keys():
         raise NotSupportedCommand
     return (globals()[Settings.command_dict[first_token]], doc)
 
@@ -45,14 +46,14 @@ def nlp_coin_exchange(doc): #TODO: return currency code
     from_c = amount = to_c = None
     for noun in doc.noun_chunks: #root of the noun chunks will be always the currency
         if noun.root.i > 0 and doc[noun.root.i - 1].pos_ == 'NUM': # if there was a number before the currency it indicates that that's the part to exchange
-            from_c = noun.root
-            amount = doc[noun.root.i - 1]
+            from_c = noun.root.text
+            amount = doc[noun.root.i - 1].text
         else:
-            to_c = noun.root
+            to_c = noun.root.text
     
     if not (from_c and amount and to_c):
         return ProtocolErrors.INVALID_PARAMETERS_ERROR
-    return dict(from_coin=from_c, to_coin=to_c, amount=amount)
+    return dict(from_coin=from_c, to_coin=to_c, amount=amount) #ERROR: Somtimes from and to coin are not in the correct order
 
 
 def nlp_translate(doc):
@@ -66,7 +67,7 @@ def nlp_translate(doc):
 	matches = matcher(doc)
 	# Couldn't find language to translate to, or 'in/to <LANGUAGE>' appears more than once
 	if not matches or len(matches) > 1: 
-		return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
+		return [False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value]
 	
 	match = matcher(doc)[0] 
 	start, end = match[1], match[2]
@@ -80,7 +81,7 @@ def nlp_translate(doc):
 			first_verb = token.i
 			break
 	if first_verb is None:
-		return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
+		return [False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value]
 	# The text is everything between the first verb (tranlate, say etc) and the language to translate to, and everything after the language name - one of them will be an empty string
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}

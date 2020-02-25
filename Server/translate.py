@@ -1,4 +1,3 @@
-from spacy.matcher import Matcher
 from flask import jsonify
 from googletrans import Translator
 

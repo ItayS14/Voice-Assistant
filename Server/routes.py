@@ -7,7 +7,7 @@ from flask_mail import Message
 import Server.internet_scrappers as internet_scrappers
 import Server.translate
 from Server.calculator import calculate
-
+import Server.nlp
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -179,7 +179,14 @@ def profile(username):
         'image': user.profile_image
     }])    
 
-    
+@app.route('/parse/<text>', methods=['GET'])
+def parse(text):
+    try:
+        res = Server.nlp.parse(text)
+        data = res[0](res[1])
+        return jsonify(data)
+    except Server.nlp.NotSupportedCommand:
+        return "Not Supported Command error!" # Change this to ProtocolError
 
 
 # NOTE: how should we use the is_active method for current_user?
