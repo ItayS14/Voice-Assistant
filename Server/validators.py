@@ -1,7 +1,7 @@
 from Server.models import User
 import string
 from validate_email import validate_email as email_validation
-from Server.config import calculator as settings
+from Server.config import ValidatorsSettings as Settings
 
 def validate_username(username):
     """
@@ -35,7 +35,7 @@ def validate_password(password):
     :param password: the password to check (str)
     :return: does the password fit the standards or not (bool)
     """
-    if not (settings['MIN_PASSWORD_LEN'] < len(password) < settings['MAX_PASSWORD_LEN']):
+    if not (Settings.MIN_PASSWORD_LEN < len(password) < Settings.MAX_PASSWORD_LEN):
         return False
     lower = any(char.islower() for char in password)
     upper = any(char.isupper() for char in password)
