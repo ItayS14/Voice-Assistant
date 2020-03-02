@@ -1,16 +1,18 @@
 import wikipedia
 from wikipedia.exceptions import DisambiguationError
 import requests
-from googletrans import Translator
-from Server.config import internet_scrappers as settings
+from Server.config import InternetScrappersSettings as Settings
+
 
 class NoResultsFound(Exception):
     """Raised when there are no results from keyword search in wikipedia"""
     pass
 
+
 class InvalidCurrencyCode(Exception):
     """Raised when one of the parameters for coin_exchange function is an invalid code"""
     pass
+
 
 def wiki_search(keyword):
     """
@@ -30,7 +32,7 @@ def wiki_search(keyword):
         try:
             return {
                 "title" : result,
-                "summary": wikipedia.summary(result, sentences=settings['SENTENCES_COUNT'], auto_suggest=False)
+                "summary": wikipedia.summary(result, sentences=Settings.SENTENCES_COUNT, auto_suggest=False)
             } 
         except DisambiguationError:
             continue
@@ -46,7 +48,7 @@ def coin_exchange(from_coin, to_coin, amount=1):
     :param amount: the amount to exchange (1 by defult - which returns the rate of a coin - int or float)
     :return: the amount in the requested coin (int)
     """
-    response = requests.get(f'{settings["EXCHANGE_API_URL"]}/{from_coin}')
+    response = requests.get(f'{Settings.EXCHANGE_API_URL}/{from_coin}')
     if not response.ok: #if there was error in the resonse (if from_coin was not valid)
         raise InvalidCurrencyCode
     data = response.json()
@@ -58,14 +60,5 @@ def coin_exchange(from_coin, to_coin, amount=1):
     rate = data["rates"][to_coin]
     return rate * amount
     
-def translate(text, dest_lang):
-    """
-    This function will translate the given text from one language to another
-    :param text: The text to translate in the source language (str)
-    :param dest_lang: (OPTIONAL) The destination language to translate to (str)
-    :return: The text in the translated language (str)
-    NOTE: Currently the assistant only supports translating from English to other languages,
-          as supporting other languages would complicate the code massively.
-    """
-    translator = Translator()
-    return translator.translate(text,dest=dest_lang).text
+
+
