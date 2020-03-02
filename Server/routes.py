@@ -180,13 +180,14 @@ def profile(username):
     }])    
 
 @app.route('/parse/<text>', methods=['GET'])
+@login_required
 def parse(text):
     try:
         res = Server.nlp.parse(text)
         data = res[0](res[1])
         return jsonify(data)
     except Server.nlp.NotSupportedCommand:
-        return "Not Supported Command error!" # Change this to ProtocolError
+        return "Unupported Command error!" # Change this to ProtocolError
 
 
 # NOTE: how should we use the is_active method for current_user?

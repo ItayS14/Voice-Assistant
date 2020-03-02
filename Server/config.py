@@ -40,4 +40,4 @@ class NLPSettings(): # Settings for the nlp module
         'does': 'nlp_wiki',
         'do': 'nlp_translate' 
     }
-    LANGUAGE_PATTERN = [{'LOWER': {'IN': ['to','in']}}, {'ENT_TYPE': {'IN': ['NORP','LANGUAGE']}}]
+    LANGUAGE_PATTERN = [{'LOWER': {'IN': ['to','in']}}, {'ENT_TYPE': {'IN': ['GPE','NORP','LANGUAGE']}}]
