@@ -27,7 +27,6 @@ def register():
         db.session.add(user)
         db.session.commit()
         return jsonify([True, {}])
-
     # add custom error msg later
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
@@ -161,23 +160,19 @@ def translate():
     return jsonify([True, res])
     
 
-@app.route('/profile/<username>', methods=['GET'])
+@app.route('/profile', methods=['GET'])
 @login_required
-def profile(username):
+def profile():
     """
-    This function will return the profile details of a given user
-    :param username: the name of the user to check details for (str)
+    This function will return the profile details of the logged user
     :return: the details of the user (json) or None
     """
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        return jsonify([False,ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
-
+    user = current_user
     # Later, add this to support smart house devices and/or specific user settings
     return jsonify([True,{
         'username': user.username,
         'email': user.email,
-        'image': user.profile_image
+        'image': user.profile_image # Need to send the actual data and not only the string
     }])    
 
 @app.route('/parse/<text>', methods=['GET'])
@@ -189,7 +184,6 @@ def parse(text):
         return jsonify(data)
     except Server.nlp.NotSupportedCommand:
         return "Unupported Command error!" # Change this to ProtocolError
-
 
 # NOTE: how should we use the is_active method for current_user?
 # NOTE: the login process should be diffrent for API?
