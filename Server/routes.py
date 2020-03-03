@@ -183,7 +183,7 @@ def parse(text):
         data = res[0](res[1])
         return jsonify(data)
     except Server.nlp.NotSupportedCommand:
-        return "Unupported Command error!" # Change this to ProtocolError
+        return {'error_code': ProtocolErrors.UNSUPPORTED_COMMAND.value} # Change this to ProtocolError
 
 # NOTE: how should we use the is_active method for current_user?
 # NOTE: the login process should be diffrent for API?

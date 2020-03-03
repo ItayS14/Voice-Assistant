@@ -19,7 +19,8 @@ ProtocolErrors = Enum('ProtocolErrors', [
     'PARAMETERS_DO_NOT_MATCH_REQUIREMENTS',
     'INVALID_TOKEN',
     'INVALID_CURRENCY_CODE',
-    'NO_RESULTS_FOUND',])
+    'NO_RESULTS_FOUND',
+    'UNSUPPORTED_COMMAND'])
 
 ServerMethods = Enum('ServerMethods', [
     'TRANSLATE',

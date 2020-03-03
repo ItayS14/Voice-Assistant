@@ -56,7 +56,7 @@ def nlp_coin_exchange(doc): #TODO: return currency code
 			to_c = noun.root.text
 	
 	if not (from_c and amount and to_c):
-		return ProtocolErrors.INVALID_PARAMETERS
+		return {'error_code' : ProtocolErrors.INVALID_PARAMETERS.value}
 	params = dict(from_coin=from_c, to_coin=to_c, amount=amount) #ERROR: Somtimes from and to coin are not in the correct order
 	return {'route': ServerMethods.EXCHANGE.value, 'params' : params}
 
@@ -72,7 +72,7 @@ def nlp_translate(doc):
 	matches = matcher(doc)
 	# Couldn't find language to translate to, or 'in/to <LANGUAGE>' appears more than once
 	if not matches or len(matches) > 1: 
-		return [False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value]
+		return {'error_code' : ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value}
 	
 	match = matcher(doc)[0] 
 	start, end = match[1], match[2]
@@ -86,7 +86,7 @@ def nlp_translate(doc):
 			first_verb = token.i
 			break
 	if first_verb is None:
-		return [False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value]
+		return {'error_code' : ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value}
 	# The text is everything between the first verb (tranlate, say etc) and the language to translate to, and everything after the language name - one of them will be an empty string
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}
