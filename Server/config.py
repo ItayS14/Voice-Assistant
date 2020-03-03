@@ -11,15 +11,15 @@ class Config:
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
-class ProtocolErrors(Enum):
-    INVALID_PARAMETERS = auto()
-    USER_ALREADY_LOGGED = auto()
-    INVALID_CREDENTIALS = auto()
-    USER_NOT_LOGGED = auto()
-    PARAMETERS_DO_NOT_MATCH_REQUIREMENTS = auto()
-    INVALID_TOKEN = auto()
-    INVALID_CURRENCY_CODE = auto()
-    NO_RESULTS_FOUND  = auto()
+ProtocolErrors = Enum('ProtocolErrors', [
+    'INVALID_PARAMETERS',
+    'USER_ALREADY_LOGGED',
+    'INVALID_CREDENTIALS',
+    'USER_NOT_LOGGED',
+    'PARAMETERS_DO_NOT_MATCH_REQUIREMENTS',
+    'INVALID_TOKEN',
+    'INVALID_CURRENCY_CODE',
+    'NO_RESULTS_FOUND',])
 
 
 class InternetScrappersSettings():
