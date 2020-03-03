@@ -1,4 +1,4 @@
-from Server import app, db, bcrypt, ProtocolErrors, mail
+from Server import app, db, bcrypt, mail
 from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
@@ -7,6 +7,7 @@ from flask_mail import Message
 import Server.internet_scrappers as internet_scrappers
 import Server.translate
 from Server.calculator import calculate
+from Server.config import ProtocolErrors
 import Server.nlp
 
 @app.route('/register', methods=['POST'])

@@ -1,5 +1,5 @@
-from Server import ProtocolErrors, nlp
-from Server.config import NLPSettings as Settings
+from Server import nlp
+from Server.config import NLPSettings as Settings, ProtocolErrors
 from spacy.matcher import Matcher
 
 class NotSupportedCommand(Exception):

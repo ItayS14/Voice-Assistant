@@ -1,4 +1,5 @@
 import os
+from enum import Enum, auto
 
 
 class Config:
@@ -9,6 +10,16 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+
+class ProtocolErrors(Enum):
+    INVALID_PARAMETERS_ERROR = auto()
+    USER_ALREADY_LOGGED_ERROR = auto()
+    INVALID_CREDENTIALS_ERROR = auto()
+    USER_NOT_LOGGED_ERROR = auto()
+    PARAMETERS_DO_NOT_MATCH_REQUIREMENTS = auto()
+    INVALID_TOKEN = auto()
+    INVALID_CURRENCY_CODE = auto()
+    NO_RESULTS_FOUND  = auto()
 
 
 class InternetScrappersSettings():
