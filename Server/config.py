@@ -21,6 +21,15 @@ ProtocolErrors = Enum('ProtocolErrors', [
     'INVALID_CURRENCY_CODE',
     'NO_RESULTS_FOUND',])
 
+ServerMethods = Enum('ServerMethods', [
+    'TRANSLATE',
+    'EXCHANGE',
+    'WIKI_SEARCH',
+    'CALCULATE'
+    ], start=100)
+
+ClientMethods = Enum('ClientMethods',[], start=200)
+
 
 class InternetScrappersSettings():
     SENTENCES_COUNT = 2
