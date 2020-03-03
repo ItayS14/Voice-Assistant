@@ -52,7 +52,7 @@ def nlp_coin_exchange(doc): #TODO: return currency code
             to_c = noun.root.text
     
     if not (from_c and amount and to_c):
-        return ProtocolErrors.INVALID_PARAMETERS_ERROR
+        return ProtocolErrors.INVALID_PARAMETERS
     return dict(from_coin=from_c, to_coin=to_c, amount=amount) #ERROR: Somtimes from and to coin are not in the correct order
 
 

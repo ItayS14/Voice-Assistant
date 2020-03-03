@@ -12,10 +12,10 @@ class Config:
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
 class ProtocolErrors(Enum):
-    INVALID_PARAMETERS_ERROR = auto()
-    USER_ALREADY_LOGGED_ERROR = auto()
-    INVALID_CREDENTIALS_ERROR = auto()
-    USER_NOT_LOGGED_ERROR = auto()
+    INVALID_PARAMETERS = auto()
+    USER_ALREADY_LOGGED = auto()
+    INVALID_CREDENTIALS = auto()
+    USER_NOT_LOGGED = auto()
     PARAMETERS_DO_NOT_MATCH_REQUIREMENTS = auto()
     INVALID_TOKEN = auto()
     INVALID_CURRENCY_CODE = auto()

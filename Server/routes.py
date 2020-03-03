@@ -13,13 +13,13 @@ import Server.nlp
 @app.route('/register', methods=['POST'])
 def register():
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
 
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
     if not (username and email and password):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     if validate_username(username) and validate_email(email) and validate_password(password):
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -34,12 +34,12 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
 
     auth = request.form.get('auth')
     password = request.form.get('password')
     if not (auth and password):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     # Checking for both options (username validation or email validation)
     user = User.query.filter_by(email=auth).first()
@@ -51,7 +51,7 @@ def login():
         login_user(user)  # Not sure how to use the remember argument
         return jsonify([True, {}])
 
-    return jsonify([False, ProtocolErrors.INVALID_CREDENTIALS_ERROR.value])
+    return jsonify([False, ProtocolErrors.INVALID_CREDENTIALS.value])
 
 
 @app.route('/logout')
@@ -83,15 +83,15 @@ If you did not make this request then simply ignore this email and no changes wi
 def get_password_reset_token():
     # May need to add support for password change later
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
    
     email = request.form.get('email')
     if not email:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     user = User.query.filter_by(email=email).first()
     if user is None:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     send_reset_email(user)
     return jsonify([True, {}])
@@ -101,11 +101,11 @@ def get_password_reset_token():
 def password_reset(token):
     # May need to add support for password change later
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED_ERROR.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
 
     new_password = request.form.get('password')
     if not new_password:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     user = User.verify_token(token, 'PASSWORD_RESET')
     if user is None:
@@ -129,7 +129,7 @@ def exchange():
     from_coin = request.args.get('from_coin')
 
     if not (amount and to_coin and from_coin):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     
     try:
         result = internet_scrappers.coin_exchange(from_coin, to_coin, float(amount))
@@ -137,7 +137,7 @@ def exchange():
     except internet_scrappers.InvalidCurrencyCode: 
         return jsonify([False, ProtocolErrors.INVALID_CURRENCY_CODE.value])
     except ValueError: # If amount was not float value 
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS_ERROR.value])  
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])  
 
 
 @app.route('/search/<key>', methods=['GET'])
