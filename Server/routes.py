@@ -63,43 +63,48 @@ def logout():
     return jsonify([True, {}])
 
 
-def send_reset_email(user):
-    """
-    The function will send reset email to user
-    :param user: The user to send the maill to (User class)
-    """
-    token = user.get_token('PASSWORD_RESET')
-    msg = Message('Password Reset Request',
-                  sender='noreply@carmelvoiceassistant.com',
-                  recipients=[user.email])
-    # Direct the user to the password reset route (may need to change this to open the flutter app later)
-    msg.body = f'''To reset your password, visit the following link:
-{url_for('password_reset', token=token, _external=True)}
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
-    mail.send(msg)
-
-
 @app.route("/get_password_reset_token", methods=['POST'])
 def get_password_reset_token():
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
-   
     email = request.form.get('email')
     if not email:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-
     user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-
     send_reset_email(user)
+    
     return jsonify([True, {}])
 
+@app.route('/validate_code', methods=['POST'])
+def validate_code():
+    print(codes_dict)
+    if current_user.is_authenticated:
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
 
-@app.route('/password_reset/<token>', methods=['POST'])
-def password_reset(token):
+    code = request.form.get('code')
+    # The email might not be neccesairy in this request, need to check
+    email = request.form.get('email')
+    # Used for creating a token
+    user = User.query.filter_by(email=email).first()
+    print(code,email,user)
+    if user is None:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+    if not email or not code:
+        return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
+    
+    print(codes_dict.get(email))
+    if codes_dict.get(email) != code:
+        return jsonify([False, ProtocolErrors.INVALID_RESET_CODE.value])
+
+    token = user.get_token('PASSWORD_RESET')
+
+    return jsonify([True, {'token' : str(token)}])
+    
+@app.route('/new_password/<token>',methods=['POST'])
+def new_password(token):
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
@@ -120,6 +125,7 @@ def password_reset(token):
         return jsonify([True, {}])
         
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
+    
 
 
 @app.route('/exchange', methods=['GET'])
