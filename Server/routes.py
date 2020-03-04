@@ -1,4 +1,4 @@
-from Server import app, db, bcrypt, mail
+from Server import app, db, bcrypt, mail, codes_dict
 from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
@@ -9,6 +9,7 @@ import Server.translate
 from Server.calculator import calculate
 from Server.config import ProtocolErrors
 import Server.nlp
+from Server.utils import send_reset_email
 
 @app.route('/register', methods=['POST'])
 def register():

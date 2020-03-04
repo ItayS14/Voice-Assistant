@@ -11,6 +11,8 @@ class Config:
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
+PASSWORD_RESET_CODE_LEN = 6
+
 ProtocolErrors = Enum('ProtocolErrors', [
     'INVALID_PARAMETERS',
     'USER_ALREADY_LOGGED',
@@ -20,7 +22,8 @@ ProtocolErrors = Enum('ProtocolErrors', [
     'INVALID_TOKEN',
     'INVALID_CURRENCY_CODE',
     'NO_RESULTS_FOUND',
-    'UNSUPPORTED_COMMAND'])
+    'UNSUPPORTED_COMMAND',
+    'INVALID_RESET_CODE'])
 
 ServerMethods = Enum('ServerMethods', [
     'TRANSLATE',

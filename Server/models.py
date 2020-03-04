@@ -1,5 +1,5 @@
 from flask import Flask
-from Server import db, login_manager
+from Server import db, login_manager, app
 from flask_login import UserMixin
 # May need to change the type of the serializer, but this works just fine for now
 from itsdangerous import URLSafeTimedSerializer as Serializer
