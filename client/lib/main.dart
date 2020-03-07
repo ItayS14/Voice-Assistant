@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:client/login.dart';
-import 'package:client/register.dart';
-import 'package:client/speech.dart';
+import 'package:client/screens/login.dart';
+import 'package:client/screens/register.dart';
+import 'package:client/screens/speech.dart';
 
 void main() => runApp(MyApp());
 

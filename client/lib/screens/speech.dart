@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:client/login_system_template.dart';
+import 'package:client/app_template.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:requests/requests.dart';
 
 class SpeechRecognitionScreen extends StatefulWidget {
   SpeechRecognitionScreen({Key key}) : super(key: key);
@@ -13,7 +14,7 @@ class SpeechRecognitionScreen extends StatefulWidget {
 class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
   SpeechToText _speech;  
   bool _isAvailable = false;
-  String _text = "";
+  String _text = "Hello, How can i help you?";
   
   @override
   void initState(){
@@ -28,7 +29,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoginSystemTemplate(
+    return AppTemplate(
       widgets: <Widget>[
         Container(
           height: MediaQuery.of(context).size.height * 0.8,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:circular_check_box/circular_check_box.dart';
-import 'package:client/app_form.dart';
-import 'package:client/app_button.dart';
-import 'package:client/login_system_template.dart';
-import 'package:client/bottom_button.dart';
+import 'package:client/custom_widgets/app_form.dart';
+import 'package:client/custom_widgets/app_button.dart';
+import 'package:client/app_template.dart';
+import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:requests/requests.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -19,7 +19,7 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context){
-    return LoginSystemTemplate(
+    return AppTemplate(
       widgets: <Widget>[
         SizedBox(height: 60),
         Image.asset('assets/voice_asistant_icon.png', scale: 3),
