@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:client/app_template.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:client/utils/network.dart';
 
 class SpeechRecognitionScreen extends StatefulWidget {
   SpeechRecognitionScreen({Key key}) : super(key: key);
@@ -13,8 +15,9 @@ class SpeechRecognitionScreen extends StatefulWidget {
 class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
   SpeechToText _speech;  
   bool _isAvailable = false;
-  String _text = "Hello, How can i help you?";
-  
+  String _header = "Hello, How can i help you?";
+  String _text = "";
+
   @override
   void initState(){
     super.initState();
@@ -34,39 +37,35 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
           height: MediaQuery.of(context).size.height * 0.8,
           padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.1),
           alignment: Alignment.topLeft,
-          child: Text(_text, style: TextStyle(fontSize: 25),),
+          child: Text(_header, style: TextStyle(fontSize: 25),),
         ),
+        Text(_text),
         Align(
           alignment: Alignment.bottomCenter,
-          child: GestureDetector(
-            child: FloatingActionButton(
-                child: Icon(Icons.mic),
-            ),
-            onLongPress: () {
-              print('listening');
-              _startListening();
-            },
-            onLongPressEnd: (LongPressEndDetails _) {
-              print('Stoped listening: $_text');
-              _stopListening();
-            },
-          )
+          child: RaisedButton(
+            child: Icon(Icons.mic),
+            onPressed: _startListening    
+          ),
         )
       ],
     );
   }
 
   _startListening() {
-    if (_isAvailable){
+    _header = "I'm listening...";
+    setState(() {});
+    if (_isAvailable) {
       _speech.listen(onResult: (SpeechRecognitionResult result) {
-          _text = "${result.recognizedWords} - ${result.finalResult}";
-        });
-      }
-    setState(() { });
+          _text = "${result.recognizedWords}";
+          if(result.finalResult) {
+            parse(_text).then(_onResult);
+          }
+          setState(() {});
+      });
+    }
   }
 
-  _stopListening() {
-    _speech.stop();
-    setState(() {});
+  _onResult(res) {
+    Alert(context: context, title: 'Result', desc: '${res}', type: AlertType.info).show();
   }
 }

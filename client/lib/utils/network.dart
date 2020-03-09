@@ -30,3 +30,8 @@ dynamic register(String username, String password, String email) async {
   bodyEncoding: RequestBodyEncoding.FormURLEncoded); 
   return res.json();
 }
+
+dynamic parse(String query) async {
+  final res = await Requests.get('$SERVER_URL/parse/$query');
+  return res.json();
+}
