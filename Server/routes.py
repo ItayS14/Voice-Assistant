@@ -1,4 +1,4 @@
-from Server import app, db, bcrypt, mail, codes_dict
+from Server import app, db, bcrypt, mail
 from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
@@ -9,7 +9,7 @@ import Server.translate
 from Server.calculator import calculate
 from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
-from Server.utils import send_reset_email
+from Server.utils import send_reset_email,verify_code
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -80,7 +80,6 @@ def get_password_reset_token():
 
 @app.route('/validate_code', methods=['POST'])
 def validate_code():
-    print(codes_dict)
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
 
@@ -95,8 +94,8 @@ def validate_code():
     if not email or not code:
         return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
     
-    print(codes_dict.get(email))
-    if codes_dict.get(email) != code:
+
+    if not verify_code(user,code):
         return jsonify([False, ProtocolErrors.INVALID_RESET_CODE.value])
 
     token = user.get_token('PASSWORD_RESET')

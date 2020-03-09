@@ -16,6 +16,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     house_id = db.Column(db.Integer, db.ForeignKey('house.id'))
+    reset_code = db.Column(db.String(6), unique=True, nullable=True)
+    updated_time = db.Column(db.Integer, nullable=True)
     profile_image = db.Column(db.String(32), nullable=False, default='default.jpg')
 
     def get_token(self, salt):
