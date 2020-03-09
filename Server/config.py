@@ -25,6 +25,10 @@ ProtocolErrors = Enum('ProtocolErrors', [
     'UNSUPPORTED_COMMAND',
     'INVALID_RESET_CODE'])
 
+class ProtocolException(Exception):
+    def __init__(self, error):
+        self._error = error
+
 ServerMethods = Enum('ServerMethods', [
     'TRANSLATE',
     'EXCHANGE',

@@ -7,7 +7,7 @@ from flask_mail import Message
 import Server.internet_scrappers as internet_scrappers
 import Server.translate
 from Server.calculator import calculate
-from Server.config import ProtocolErrors
+from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
 from Server.utils import send_reset_email
 
@@ -183,14 +183,14 @@ def profile():
     }])    
 
 @app.route('/parse/<text>', methods=['GET'])
-@login_required
+#@login_required
 def parse(text):
     try:
         res = Server.nlp.parse(text)
         data = res[0](res[1])
-        return jsonify(data)
-    except Server.nlp.NotSupportedCommand:
-        return {'error_code': ProtocolErrors.UNSUPPORTED_COMMAND.value} # Change this to ProtocolError
+        return jsonify([True,data])
+    except ProtocolException as e:
+        return jsonify([False, e._error.value])
 
 # NOTE: how should we use the is_active method for current_user?
 # NOTE: the login process should be diffrent for API?

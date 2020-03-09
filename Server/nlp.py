@@ -1,9 +1,7 @@
 from Server import nlp
-from Server.config import NLPSettings as Settings, ProtocolErrors, ServerMethods, ClientMethods
+from Server.config import NLPSettings as Settings, ProtocolErrors, ServerMethods, ClientMethods, ProtocolException
 from spacy.matcher import Matcher
 
-class NotSupportedCommand(Exception):
-	pass
 
 
 def parse(text):
@@ -20,7 +18,7 @@ def parse(text):
 		return (globals()[Settings.how_dict[doc[1].text]], doc)
 	# Checking if the first word is a VERB might not work
 	if first_token not in Settings.command_dict.keys():
-		raise NotSupportedCommand
+		raise ProtocolException(ProtocolErrors.UNSUPPORTED_COMMAND)
 	return (globals()[Settings.command_dict[first_token]], doc)
 
 
@@ -56,7 +54,8 @@ def nlp_coin_exchange(doc): #TODO: return currency code
 			to_c = noun.root.text
 	
 	if not (from_c and amount and to_c):
-		return {'error_code' : ProtocolErrors.INVALID_PARAMETERS.value}
+		raise ProtocolException(ProtocolErrors.INVALID_PARAMETERS)
+
 	params = dict(from_coin=from_c, to_coin=to_c, amount=amount) #ERROR: Somtimes from and to coin are not in the correct order
 	return {'route': ServerMethods.EXCHANGE.value, 'params' : params}
 
@@ -72,7 +71,7 @@ def nlp_translate(doc):
 	matches = matcher(doc)
 	# Couldn't find language to translate to, or 'in/to <LANGUAGE>' appears more than once
 	if not matches or len(matches) > 1: 
-		return {'error_code' : ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value}
+		raise ProtocolException(ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS)
 	
 	match = matcher(doc)[0] 
 	start, end = match[1], match[2]
@@ -86,7 +85,7 @@ def nlp_translate(doc):
 			first_verb = token.i
 			break
 	if first_verb is None:
-		return {'error_code' : ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value}
+		raise ProtocolException(ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS)
 	# The text is everything between the first verb (tranlate, say etc) and the language to translate to, and everything after the language name - one of them will be an empty string
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}
