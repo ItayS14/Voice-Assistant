@@ -4,7 +4,7 @@ import 'package:client/custom_widgets/app_form.dart';
 import 'package:client/custom_widgets/app_button.dart';
 import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/bottom_button.dart';
-import 'package:requests/requests.dart';
+import 'package:client/utils/network.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LoginPage extends StatefulWidget{
@@ -58,21 +58,14 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  _login() async {
+  _login() {
     _formKey.currentState.save();
-    final res = await Requests.post('http://10.0.2.2:5000/login', 
-    body: {
-      'auth': _auth, 
-      'password': _password
-    }, 
-    bodyEncoding: RequestBodyEncoding.FormURLEncoded);
-
-    final data = res.json();
+    final data = login(_auth, _password);
     print(data);
     if (data[0]) // Action success
     {
       Alert(context: context, title: "Logged in", type: AlertType.success).show(); //For now
-      final res = await Requests.get('http://10.0.2.2:5000/logout');
+      final res = logout();
       print('Logging out');
       print(res.json());
     }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:client/app_template.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:requests/requests.dart';
 
 class SpeechRecognitionScreen extends StatefulWidget {
   SpeechRecognitionScreen({Key key}) : super(key: key);
