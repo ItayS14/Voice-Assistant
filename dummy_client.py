@@ -3,13 +3,13 @@ import json
 
 def main():
 	test = Session()   
-	print('Register: ', test.register('abc','asfdF123123411','jday.david.2002@gmail.com').text)
-	print('Login: ', test.login('abc', 'asfdF123123411').text)
-	#print('Request: ', request_reset_password(s,'jday.david.2002@gmail.com').text)
-	#print('Reset: ', reset_password(s,'eyJ1c2VyX2lkIjoxfQ.XeqPBw.ZODG4SO9kGiQ8acGbptsAX3cOEU','212456724716714256471asdf78aA'))
-	print('Profile: ', test.profile())
-	
-	print('Logout: ', test.logout())
+	#print('Register: ', test.register('abc','asfdF123123411','jday.david.2002@gmail.com').text)
+	print('Login: ', test.login('abc', 'Aa1234567').text)
+	#print('Profile: ', test.profile())
+	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
+	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
+	#print('New password: ', test.new_password('eyJ1c2VyX2lkIjoxfQ.XmAwMg.552pVgu2_gg4x0mpWj4rd_tbhjw','Aa1234567'))
+	#print('Logout: ', test.logout())
 
 
 class Session:
@@ -55,31 +55,6 @@ class Session:
 		"""
 		return self.session.get(self.server_url + '/logout')
 
-
-	def request_reset_password(self,email):
-		"""
-		This function will ask for a password reset (send an email to the user)
-		:param email: email to send the link to (str)
-		:return: requests.response
-		"""
-		data = {
-			'email':email
-		}
-		return self.session.post(self.server_url + "/password_reset",data)
-
-
-	def reset_password(self, token, new_password):
-		"""
-		This function will reset the password with a token
-		:param token: the validity token (str)
-		:param new_password: the new password to change in the server (str)
-		:return: requests.response
-		"""
-		data = {
-			'password': new_password
-		}
-		return self.session.post(self.server_url + "/password_reset/" + token, data)
-
 	def translate(self,text,dest_lang):
 		"""
 		This function will translate the text to the destination language
@@ -100,6 +75,42 @@ class Session:
 		:return: details about the specific user (dict)
 		"""
 		return json.loads(self.session.get(self.server_url + '/profile').text)
+
+	def reset_password_request(self, email):
+		"""
+		This function will create a password reset request for a user
+		:param email: the mail to send the code to
+		:return: None
+		"""
+		data = {
+			'email' : email
+		}
+		return json.loads(self.session.post(self.server_url + '/get_password_reset_token', data).text)
+
+	def password_reset(self, code, email):
+		"""
+		This function sends the given reset code to the server and recieves a token in response
+		:param code: the code the client enters (str)
+		:param email: the email of the user (str)
+		:return: the token given by the server used to authenticate (str)
+		"""
+		data = {
+			'code' : str(code),
+			'email': email
+		}
+		return json.loads(self.session.post(self.server_url + '/validate_code', data).text)
+
+	def new_password(self, token, password):
+		"""
+		This function will update a user's password using the token he got in the last level
+		:param token: the token to use to authenticate (str)
+		:param password: the new password which the client chose (str)
+		:return: None
+		"""
+		data = {
+			'password': password
+		}
+		return json.loads(self.session.post(self.server_url + '/new_password/' + token,data).text)
 
 if __name__ == '__main__':
 	main()

@@ -11,15 +11,32 @@ class Config:
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
-class ProtocolErrors(Enum):
-    INVALID_PARAMETERS_ERROR = auto()
-    USER_ALREADY_LOGGED_ERROR = auto()
-    INVALID_CREDENTIALS_ERROR = auto()
-    USER_NOT_LOGGED_ERROR = auto()
-    PARAMETERS_DO_NOT_MATCH_REQUIREMENTS = auto()
-    INVALID_TOKEN = auto()
-    INVALID_CURRENCY_CODE = auto()
-    NO_RESULTS_FOUND  = auto()
+PASSWORD_RESET_CODE_LEN = 6
+
+ProtocolErrors = Enum('ProtocolErrors', [
+    'INVALID_PARAMETERS',
+    'USER_ALREADY_LOGGED',
+    'INVALID_CREDENTIALS',
+    'USER_NOT_LOGGED',
+    'PARAMETERS_DO_NOT_MATCH_REQUIREMENTS',
+    'INVALID_TOKEN',
+    'INVALID_CURRENCY_CODE',
+    'NO_RESULTS_FOUND',
+    'UNSUPPORTED_COMMAND',
+    'INVALID_RESET_CODE'])
+
+class ProtocolException(Exception):
+    def __init__(self, error):
+        self._error = error
+
+ServerMethods = Enum('ServerMethods', [
+    'TRANSLATE',
+    'EXCHANGE',
+    'WIKI_SEARCH',
+    'CALCULATE'
+    ], start=100)
+
+ClientMethods = Enum('ClientMethods',[], start=200)
 
 
 class InternetScrappersSettings():

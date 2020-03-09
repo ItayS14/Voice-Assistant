@@ -14,5 +14,6 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 mail = Mail(app)
 nlp = spacy.load('en_core_web_sm')
+codes_dict = dict()
 
 from Server import routes
