@@ -64,7 +64,7 @@ def nlp_translate(doc):
 	"""
 	This function will get the relevant parameters for the translate function 
 	:param doc: the command the user gave (as Spacy doc)
-	:return: the relevant parameters to the translate function (dict of param_name:param)
+	:return: the relevant parameters to the translate function (dictionary)
 	"""
 	matcher = Matcher(nlp.vocab)
 	matcher.add("LANGUAGE_PATTERN",[Settings.LANGUAGE_PATTERN])
@@ -90,4 +90,44 @@ def nlp_translate(doc):
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}
 	return {'route': ServerMethods.TRANSLATE.value,'params' : params }
+
+def nlp_calculate(doc):
+	"""
+	This function will get the relevant parameters for the calculation function
+	:param doc: the command the user gave (Spacy Doc)
+	:return: the math calculation to be performed (dictionary)
+	"""
+	matcher = Matcher(nlp.vocab)
+	matcher.add("CALCULATE_PATTERN",[Settings.CALCULATE_PATTERN])
+	matches = matcher(doc)
+	if not matches:
+		raise ProtocolException(ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS)
+	
+	match = matcher(doc)[0] 
+	start = match[1] - 1
+	expression = str(doc[start:])
+	return {'route': ServerMethods.CALCULATE.value, 'params': {'expression': expression}}
+	
+
+def determine_how_func(doc):
+	"""
+	This function will determine which function should be used when the keywords 'how much' are used
+	:param doc: the command the user gave (Spacy Doc)
+	:return: the result of the one of the functions this function has called (dictionary)
+	"""
+	first, second = None, None
+	matcher = Matcher(nlp.vocab)
+	matcher.add("CALCULATE_PATTERN",[Settings.CALCULATE_PATTERN])
+	matches = matcher(doc)
+	# First, check if you can find a math calculation in the sentence
+	# May be more efficient way to check instead of matching twice
+	if matches:
+		first, second = nlp_calculate, nlp_coin_exchange
+	else:
+		first, second = nlp_coin_exchange, nlp_calculate
+	
+	try:
+		return first(doc)
+	except:
+		return second(doc)
 
