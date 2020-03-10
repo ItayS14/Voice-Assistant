@@ -70,4 +70,4 @@ class NLPSettings(): # Settings for the nlp module
         'do': 'nlp_translate' 
     }
     LANGUAGE_PATTERN = [{'LOWER': {'IN': ['to','in']}}, {'ENT_TYPE': {'IN': ['GPE','NORP','LANGUAGE']}}]
-    CALCULATE_PATTERN = [{'POS': {'IN': ['SYM','PUNCT']}}]
+    CALCULATE_PATTERN = [{'POS': 'NUM'}, {'LOWER': {'IN': ['+', '-', '*', '/', '^', '%']}}, {'POS': 'NUM'}]

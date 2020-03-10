@@ -103,9 +103,10 @@ def nlp_calculate(doc):
 	if not matches:
 		raise ProtocolException(ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS)
 	
-	match = matcher(doc)[0] 
-	start = match[1] - 1
-	expression = str(doc[start:])
+	# Start from the first number and end in the last number of the last match 
+	# For example, it will work on 'calculate 5 + 5 + 5'
+	start, end = matcher(doc)[0][1], matcher(doc)[-1][2]
+	expression = str(doc[start:end])
 	return {'route': ServerMethods.CALCULATE.value, 'params': {'expression': expression}}
 	
 
@@ -119,6 +120,7 @@ def determine_how_func(doc):
 	matcher = Matcher(nlp.vocab)
 	matcher.add("CALCULATE_PATTERN",[Settings.CALCULATE_PATTERN])
 	matches = matcher(doc)
+	
 	# First, check if you can find a math calculation in the sentence
 	# May be more efficient way to check instead of matching twice
 	if matches:

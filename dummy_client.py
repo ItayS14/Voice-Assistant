@@ -4,11 +4,12 @@ import json
 def main():
 	test = Session()   
 	#print('Register: ', test.register('abc','asfdF123123411','jday.david.2002@gmail.com').text)
-	print('Login: ', test.login('abc', 'Aa1234567').text)
+	#print('Login: ', test.login('abc', 'Aa1234567').text)
 	#print('Profile: ', test.profile())
 	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
 	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
 	#print('New password: ', test.new_password('eyJ1c2VyX2lkIjoxfQ.XmAwMg.552pVgu2_gg4x0mpWj4rd_tbhjw','Aa1234567'))
+	print('Calculate:', test.calculate('5 + 5'))
 	#print('Logout: ', test.logout())
 
 
@@ -111,6 +112,17 @@ class Session:
 			'password': password
 		}
 		return json.loads(self.session.post(self.server_url + '/new_password/' + token,data).text)
-
+	
+	def calculate(self, expression):
+		"""
+		This function will calculate the result of a mathematical expression
+		:param expression: the mathematical expression to be calculated (str)
+		:return: the value of the expression (int)
+		"""
+		data = {
+			'expression': expression
+		}
+		return json.loads(self.session.get(self.server_url + '/calculate',params=data).text)
+	
 if __name__ == '__main__':
 	main()
