@@ -5,7 +5,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from Server.validators import *
 from flask_mail import Message
 import Server.internet_scrappers as internet_scrappers
-import Server.translate
+import Server.translate, Server.calculator
 from Server.calculator import calculate
 from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
@@ -181,8 +181,20 @@ def profile():
         'image': user.profile_image # Need to send the actual data and not only the string
     }])    
 
+@app.route('/calculate',methods=['GET'])
+@login_required
+def calculate():
+    expression = request.args.get('expression')
+    print(expression)
+    res = None
+    try:
+        res = Server.calculator.calculate(expression)
+    except Exception:
+        return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
+    return jsonify([True, {'result': res}])
+
 @app.route('/parse/<text>', methods=['GET'])
-#@login_required
+@login_required
 def parse(text):
     try:
         res = Server.nlp.parse(text)
