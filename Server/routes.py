@@ -86,13 +86,13 @@ def validate_code():
     code = request.form.get('code')
     # The email might not be neccesairy in this request, need to check
     email = request.form.get('email')
-    # Used for creating a token
-    user = User.query.filter_by(email=email).first()
-    print(code,email,user)
-    if user is None:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+
     if not email or not code:
         return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
+    # Used for creating a token
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     
 
     if not verify_code(user,code):
@@ -146,11 +146,15 @@ def exchange():
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])  
 
 
-@app.route('/search/<key>', methods=['GET'])
+@app.route('/search', methods=['GET'])
 @login_required
-def search(key):
+def search():
+    text = request.args.get('text')
+
+    if not text:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     try:
-        res = internet_scrappers.wiki_search(key)
+        res = internet_scrappers.wiki_search(text)
         return jsonify([True, res])
     except internet_scrappers.NoResultsFound: # There are no results for that key
         return jsonify([False, ProtocolErrors.NO_RESULTS_FOUND.value])
@@ -159,10 +163,13 @@ def search(key):
 @app.route('/translate', methods=['GET'])
 @login_required
 def translate():
-    data = request.args.get('data')
-    dest_lang = request.args.get('dest_lang')
+    text = request.args.get('text')
+    dest_lang = request.args.get('lang')
+
+    if not (text and dest_lang):
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     # Can't think of a specific exception case currently, might need to add later
-    res = Server.translate.translate(data,dest_lang)
+    res = Server.translate.translate(text,dest_lang)
     return jsonify([True, res])
     
 
@@ -185,13 +192,14 @@ def profile():
 @login_required
 def calculate():
     expression = request.args.get('expression')
-    print(expression)
+    if not expression:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     res = None
     try:
         res = Server.calculator.calculate(expression)
     except Exception:
         return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
-    return jsonify([True, {'result': res}])
+    return jsonify([True, res])
 
 @app.route('/parse/<text>', methods=['GET'])
 @login_required
