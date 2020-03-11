@@ -1,7 +1,7 @@
 import 'package:requests/requests.dart';
 
-const SERVER_URL = 'http://10.0.2.2:5000';
-
+const SERVER_URL = 'http://10.0.0.24:5000';
+const ROUTES = ['translate', 'exchange', 'search', 'calculate'];
 // The function will login a user to the app
 dynamic login(String auth, String password) async {
   final res = await Requests.post('$SERVER_URL/login', 
@@ -34,4 +34,28 @@ dynamic register(String username, String password, String email) async {
 dynamic parse(String query) async {
   final res = await Requests.get('$SERVER_URL/parse/$query');
   return res.json();
+}
+
+
+dynamic translate(String language, String content) async {
+  final res = await Requests.get('$SERVER_URL/translate?dest_lang=$language&data=$content');
+  return res.json();
+}
+
+dynamic exchange(String from_coin, String to_coin, String amount) async { // change string to int on server and here
+  final res = await Requests.get('$SERVER_URL/translate?from_coin=$from_coin&to_coin=$to_coin&amount=$amount');
+  return res.json();
+}
+
+dynamic serverMethods(Map<String, dynamic> params) async {
+  String route = ROUTES[params['route'] - 100];
+  String paramsEncoded = encodeMap(params["params"]);
+  final res = await Requests.get('$SERVER_URL/$route?$paramsEncoded');
+  print('$SERVER_URL/$route?$paramsEncoded');
+  print(res.content());
+  return res.json();
+}
+
+String encodeMap(Map data) {
+  return data.keys.map((key) => "${Uri.encodeComponent(key)}=${Uri.encodeComponent(data[key])}").join("&");
 }
