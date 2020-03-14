@@ -52,7 +52,6 @@ dynamic serverMethods(Map<String, dynamic> params) async {
   String paramsEncoded = encodeMap(params["params"]);
   final res = await Requests.get('$SERVER_URL/$route?$paramsEncoded');
   print('$SERVER_URL/$route?$paramsEncoded');
-  print(res.content());
   return res.json();
 }
 

@@ -60,18 +60,14 @@ class LoginPageState extends State<LoginPage> {
 
   _login() {
     _formKey.currentState.save();
-    final data = login(_auth, _password);
-    print(data);
-    if (data[0]) // Action success
-    {
-      Alert(context: context, title: "Logged in", type: AlertType.success).show(); //For now
-      final res = logout();
-      print('Logging out');
-      print(res.json());
-    }
-    else{
-      Alert(context: context, title: "Server Error", desc: '$data', type: AlertType.error).show(); //For now
-    }
+    login(_auth, _password).then((res) {
+      print(res);
+      if (res[0]) {
+        Navigator.of(context).pushNamed('/main');
+      } else {
+        Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
+      }
+    });
   }
 
   //The function will build the forms for the login screen

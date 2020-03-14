@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/profile_text_box.dart';
+import 'package:client/utils/network.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key key}) : super(key: key);
@@ -9,6 +10,15 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppTemplate(
       widgets: <Widget>[
+        IconButton(
+          icon: Icon(Icons.exit_to_app),
+          onPressed: () {
+            logout().then((res) {
+              print(res);
+              Navigator.of(context).pop(); // Might cause troubles in auto login - check it later
+            });
+          },
+        ),
         Container(
           height: MediaQuery.of(context).size.height * 0.6,
           alignment: Alignment.center,

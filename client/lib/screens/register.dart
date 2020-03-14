@@ -49,11 +49,12 @@ class RegisterPageState extends State<RegisterPage> {
     _formKey.currentState.save();
     if (_formKey.currentState.validate())
     {
-      final data = register(_username, _password, _email);
-      if (data[0])
-        Alert(context: context, title: "Registered successfully", type: AlertType.success).show(); //For now
-      else
-        Alert(context: context, title: "Server Error", desc: '$data', type: AlertType.error).show(); //For now
+      register(_username, _password, _email).then((res) {
+        if (res[0])
+          Navigator.of(context).pop();
+        else
+          print('$res');
+      });
     }
   }
   //The function will build the forms of the register page
