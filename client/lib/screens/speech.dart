@@ -17,7 +17,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
   SpeechToText _speech;  
   FlutterTts _tts;
   bool _isAvailable = false;
-  String _header = "Hello, How can i help you?";
+  String _header = "Hello, How can I help you?";
   String _text = "";
 
   @override
@@ -43,20 +43,22 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
   Widget build(BuildContext context) {
     return AppTemplate(
       widgets: <Widget>[
-        Container(
-          height: MediaQuery.of(context).size.height * 0.8,
-          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.1),
-          alignment: Alignment.topLeft,
-          child: Text(_header, style: TextStyle(fontSize: 25),),
-        ),
-        Text(_text),
+        SizedBox(height: 50),
         Align(
-          alignment: Alignment.bottomCenter,
-          child: RaisedButton(
+          alignment: Alignment.topLeft,
+          child: Text(_header, style: TextStyle(fontSize: 25))
+        ),
+        Container(
+          height: MediaQuery.of(context).size.height * 0.65,
+          padding: EdgeInsets.only(top: 10),
+          alignment: Alignment.topLeft,
+          child: Text(_text, style: TextStyle(fontSize: 25)),
+        ),
+        FloatingActionButton(
             child: Icon(Icons.mic),
             onPressed: _startListening    
-          ),
-        )
+        ),
+        SizedBox(height: 10)
       ],
     );
   }
@@ -69,6 +71,8 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
           _text = "${result.recognizedWords}";
           if(result.finalResult) {
             parse(_text).then(_onResult);
+            _header = "Hello, How can I help you?";
+            _text = "";
           }
           setState(() {});
       });
