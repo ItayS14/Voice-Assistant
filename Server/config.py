@@ -54,7 +54,8 @@ class NLPSettings(): # Settings for the nlp module
     'exchange': 'nlp_coin_exchange',
     'translate': 'nlp_translate',
     'say': 'nlp_translate',
-    'tell': 'nlp_wiki'    
+    'tell': 'nlp_wiki',
+    'calculate': 'nlp_calculate'    
     }
     wh_dict = {
         'what': 'nlp_wiki',
@@ -63,9 +64,10 @@ class NLPSettings(): # Settings for the nlp module
         'which': 'nlp_wiki',
     }
     how_dict = {
-        'much': 'nlp_coin_exchange',
+        'much': 'determine_how_func',
         'many': 'nlp_coin_exchange', # might change
         'does': 'nlp_wiki',
         'do': 'nlp_translate' 
     }
     LANGUAGE_PATTERN = [{'LOWER': {'IN': ['to','in']}}, {'ENT_TYPE': {'IN': ['GPE','NORP','LANGUAGE']}}]
+    CALCULATE_PATTERN = [{'POS': 'NUM'}, {'LOWER': {'IN': ['+', '-', '*', '/', '^', '%']}}, {'POS': 'NUM'}]
