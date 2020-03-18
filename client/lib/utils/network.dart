@@ -47,6 +47,39 @@ dynamic exchange(String from_coin, String to_coin, String amount) async { // cha
   return res.json();
 }
 
+dynamic calculate(String expression) async {
+  final res = await Requests.get('$SERVER_URL/calculate?expresion=$expression');
+  return res.json;
+}
+
+dynamic getPasswordResetToken(String email) async {
+  final res = await Requests.post('$SERVER_URL/get_password_reset_token',
+  body: {
+    'email': email
+  },
+  bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+  return res.json();
+}
+
+dynamic validateCode(String code, String email) async {
+  final res = await Requests.post('$SERVER_URL/validate_code',
+  body: {
+    'code': code,
+    'email': email
+  },
+  bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+  return res.json();
+}
+
+dynamic newPassword(String token, String password) async {
+  final res = await Requests.post('$SERVER_URL/new_password/$token',
+  body: {
+    'password': password,
+  },
+  bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+  return res.json();
+}
+
 dynamic serverMethods(Map<String, dynamic> params) async {
   String route = ROUTES[params['route'] - 100];
   String paramsEncoded = encodeMap(params["params"]);
