@@ -40,6 +40,21 @@ If you did not make this request then simply ignore this email and no changes wi
 '''
     mail.send(msg)
 
+def send_email_verification(user):
+    """
+    The function will send email validation toeen to usre
+    :param user: The user to send the mail to (User)
+    """
+    token = user.get_token('EMAIL_VALIDATION')
+    url = f'http://localhost:5000/validate_email/{token}'
+    msg = Message(f'Hey {user.username}, thanks for signing up to our application',
+                    sender='noreply@carmelvoiceassistant.com',
+                    recipients=[user.email])
+    msg.body = f'''In order to start using our application you must click on the link below in order to activate your account:
+    {url}
+    '''
+    mail.send(msg)
+    
 def verify_code(user,code):
     """
     This function will verify that a code is valid and in the correct time

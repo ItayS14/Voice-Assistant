@@ -3,13 +3,12 @@ from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.validators import *
-from flask_mail import Message
 import Server.internet_scrappers as internet_scrappers
 import Server.translate, Server.calculator
 from Server.calculator import calculate
 from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
-from Server.utils import send_reset_email,verify_code
+from Server.utils import send_reset_email,verify_code, send_email_verification
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -27,10 +26,22 @@ def register():
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
         db.session.commit()
+        send_email_verification(user)
         return jsonify([True, {}])
     # add custom error msg later
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
+@app.route('/validate_email/<token>')
+def validate_email_token(token):
+    email = request.form.get('email')
+    if not email:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+    user = User.query.filter_by(email=email)
+    if not user:
+        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value]) 
+    
+    user.confirmed = True
+    db.session.commit()
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -130,6 +141,9 @@ def new_password(token):
 @app.route('/exchange', methods=['GET'])
 @login_required
 def exchange():
+    if not current_user.is_active:
+        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+
     amount = request.args.get('amount')
     to_coin = request.args.get('to_coin')
     from_coin = request.args.get('from_coin')
@@ -149,6 +163,9 @@ def exchange():
 @app.route('/search', methods=['GET'])
 @login_required
 def search():
+    if not current_user.is_active:
+        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+
     text = request.args.get('text')
 
     if not text:
@@ -163,6 +180,9 @@ def search():
 @app.route('/translate', methods=['GET'])
 @login_required
 def translate():
+    if not current_user.is_active:
+        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+
     text = request.args.get('text')
     dest_lang = request.args.get('lang')
 
@@ -191,6 +211,9 @@ def profile():
 @app.route('/calculate',methods=['GET'])
 @login_required
 def calculate():
+    if not current_user.is_active:
+        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+
     expression = request.args.get('expression')
     if not expression:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
@@ -204,8 +227,12 @@ def calculate():
 @app.route('/parse/<text>', methods=['GET'])
 @login_required
 def parse(text):
+    if not current_user.is_active:
+        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+
     try:
         res = Server.nlp.parse(text)
+        print(res)
         data = res[0](res[1])
         return jsonify([True,data])
     except ProtocolException as e:

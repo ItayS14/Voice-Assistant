@@ -23,7 +23,8 @@ ProtocolErrors = Enum('ProtocolErrors', [
     'INVALID_CURRENCY_CODE',
     'NO_RESULTS_FOUND',
     'UNSUPPORTED_COMMAND',
-    'INVALID_RESET_CODE'])
+    'INVALID_RESET_CODE',
+    'USER_IS_NOT_ACTIVE'])
 
 class ProtocolException(Exception):
     def __init__(self, error):
@@ -36,7 +37,7 @@ ServerMethods = Enum('ServerMethods', [
     'CALCULATE'
     ], start=100)
 
-ClientMethods = Enum('ClientMethods',[], start=200)
+ClientMethods = 1
 
 
 class InternetScrappersSettings():
