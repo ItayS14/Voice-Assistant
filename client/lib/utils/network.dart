@@ -71,7 +71,7 @@ dynamic validateCode(String code, String email) async {
   return res.json();
 }
 
-dynamic newPassword(String token, String password) async {
+dynamic newPasswordRequest(String token, String password) async {
   final res = await Requests.post('$SERVER_URL/new_password/$token',
   body: {
     'password': password,

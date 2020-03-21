@@ -1,24 +1,28 @@
-import 'package:client/screens/validate_code.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/app_form.dart';
 import 'package:client/custom_widgets/app_button.dart';
-import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:client/utils/network.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 // CupertinoActivityIndicator
-
-class PassResetPage extends StatelessWidget {
+class NewPassScreenArguments {
+  final String token;
+  NewPassScreenArguments(this.token);
+}
+class NewPasswordPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  String email = "";
+  String token;
+  String newPassword;
   
-  PassResetPage({Key key}) : super(key: key);
+  NewPasswordPage({Key key, @required this.token}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final NewPassScreenArguments args = ModalRoute.of(context).settings.arguments;
+    this.token = args.token;
     return AppTemplate(
       widgets: <Widget>[
         Container(
@@ -26,38 +30,35 @@ class PassResetPage extends StatelessWidget {
           alignment: Alignment.center,
           height: MediaQuery.of(context).size.height * 0.5
         ),
+        Text(
+          'Please enter your new desired password here.',
+           style: GoogleFonts.lora(),
+         ),
+        SizedBox(height: 30),
         Form(
           key: _formKey,
           child: AppForm(
-            hint: "Enter your email",
-            onSaved: (input) => email = input,
-          )  
+            hint: 'Enter the password',
+            onSaved: (input) => newPassword = input,
+          )
         ),
         SizedBox(height: 30),
         AppButton(
           text: 'Submit',
           func: () {
-            _sendRequest(context);    
+            _sendRequest(context);  
           },
-        ),
-        SizedBox(height: 20),
-        BottomButton(
-          text: "Remember your password?",
-          buttonText: "Go Back",
-          onPressed: () => Navigator.of(context).pop()
-        )
+         ),
       ]
     );
   }
   _sendRequest(BuildContext context) {
     _formKey.currentState.save();
-    getPasswordResetToken(email).then((res) {
+    newPasswordRequest(token,newPassword).then((res) {
       if (res[0]) {
-        print('pass reset email $email');
-        Navigator.pushNamed( context,
-        '/validate_code',
-         arguments: CodeScreenArguments(email)
-         );
+        print(res);
+        Alert(context: context, title: "Success", desc: 'You have successfully reset your password. You are now being sent to the login page.', type: AlertType.success).show(); //For now    
+        Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
       } else {
         Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
       }

@@ -5,8 +5,9 @@ class AppForm extends StatefulWidget {
   final bool isPassword;
   final onSaved;
   final validator;
+  final int maxLength;
 
-  AppForm({Key key, @required this.hint, this.isPassword = false, this.onSaved, this.validator}) : super(key: key);
+  AppForm({Key key, @required this.hint, this.isPassword = false, this.onSaved, this.validator, this.maxLength = 150}) : super(key: key);
 
   @override
   AppFormState createState() => AppFormState();
@@ -28,9 +29,12 @@ class AppFormState extends State<AppForm> {
           },
           child: Icon(_showForm ? Icons.visibility : Icons.visibility_off)) : null,
         labelText: widget.hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4))),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+        counterText: "", // Hide the amount of chars the user can enter
+        ),
         onSaved: widget.onSaved,
         validator: widget.validator,
+        maxLength: widget.maxLength,
     );
   }
 }
