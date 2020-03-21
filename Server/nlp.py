@@ -3,7 +3,6 @@ from Server.config import NLPSettings as Settings, ProtocolErrors, ServerMethods
 from spacy.matcher import Matcher
 
 
-
 def parse(text):
 	"""
 	The function is the main nlp parsing, it will return the proper nlp function for that text and nlp doc

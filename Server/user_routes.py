@@ -15,15 +15,19 @@ def register():
     if not (username and email and password):
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
-    if validators_handler.username(username) and validators_handler.email(email) and validators_handler.password(password):
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        user = User(username=username, email=email, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
-        utils.send_email_verification(user)
-        return jsonify([True, {}])
-    # add custom error msg later
-    return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
+    if not validators_handler.username(username):
+        return jsonify([False, ProtocolErrors.INVALID_USERNAME.value]) 
+    if not validators_handler.email(email):
+        return jsonify([False, ProtocolErrors.INVALID_EMAIL.value])
+    if not validators_handler.password(password):
+        return jsonify([False, ProtocolErrors.INVALID_PASSWORD.value]) 
+
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    user = User(username=username, email=email, password=hashed_password)
+    db.session.add(user)
+    db.session.commit()
+    utils.send_email_verification(user)
+    return jsonify([True, {}])
 
 
 @app.route('/validate_email/<token>')
@@ -34,7 +38,7 @@ def validate_email_token(token):
     
     user = User.query.filter_by(email=email)
     if not user:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value]) 
+        return jsonify([False, ProtocolErrors.INVALID_EMAIL.value]) 
 
     user.confirmed = True
     db.session.commit()
@@ -133,7 +137,7 @@ def new_password(token):
         db.session.commit()
         return jsonify([True, {}])
         
-    return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
+    return jsonify([False, ProtocolErrors.INVALID_PASSWORD.value])
     
 
 @app.route('/profile', methods=['GET'])

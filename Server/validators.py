@@ -29,7 +29,7 @@ class Validators:
         """
         if not validate_email(email): # For now only checks the email format (later emaill verification will be sent)
             return False
-
+            
         email = User.query.filter_by(email=email).first()
         return email is None
 
