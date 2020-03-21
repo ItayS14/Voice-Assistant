@@ -1,8 +1,7 @@
-from Server import app, internet_handler
+from Server import app, server_features_handler
 from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
-import Server.calculator
 from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
 
@@ -21,9 +20,9 @@ def exchange():
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     
     try:
-        result = internet_handler.coin_exchange(from_coin, to_coin, float(amount))
+        result = server_features_handler.coin_exchange(from_coin, to_coin, float(amount))
         return jsonify([True, result]) # For example: [True, 3]
-    except internet_handler.InvalidCurrencyCode: 
+    except server_features_handler.InvalidCurrencyCode: 
         return jsonify([False, ProtocolErrors.INVALID_CURRENCY_CODE.value])
     except ValueError: # If amount was not float value 
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])  
@@ -40,9 +39,9 @@ def search():
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     try:
-        res = internet_handler.wiki_search(text)
+        res = server_features_handler.wiki_search(text)
         return jsonify([True, res])
-    except internet_handler.NoResultsFound: # There are no results for that key
+    except server_features_handler.NoResultsFound: # There are no results for that key
         return jsonify([False, ProtocolErrors.NO_RESULTS_FOUND.value])
 
 
@@ -57,7 +56,7 @@ def translate():
     if not (text and dest_lang):
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     # Can't think of a specific exception case currently, might need to add later
-    res = internet_handler.translate(text,dest_lang)
+    res = server_features_handler.translate(text,dest_lang)
     return jsonify([True, res])
 
 
@@ -72,7 +71,7 @@ def calculate():
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     res = None
     try:
-        res = Server.calculator.calculate(expression)
+        res = server_features_handler.calculate(expression)
     except Exception:
         return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
     return jsonify([True, res])

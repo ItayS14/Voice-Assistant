@@ -40,7 +40,7 @@ ServerMethods = Enum('ServerMethods', [
 ClientMethods = 1
 
 
-internet_features_handler_config = {'sentence_count': 2}
+server_features_handler_config = {'sentence_count': 2}
 
 
 class ValidatorsSettings():
