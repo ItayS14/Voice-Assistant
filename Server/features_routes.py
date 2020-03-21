@@ -21,11 +21,9 @@ def exchange():
     
     try:
         result = server_features_handler.coin_exchange(from_coin, to_coin, float(amount))
-        return jsonify([True, result]) # For example: [True, 3]
-    except server_features_handler.InvalidCurrencyCode: 
-        return jsonify([False, ProtocolErrors.INVALID_CURRENCY_CODE.value])
-    except ValueError: # If amount was not float value 
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])  
+        return jsonify([True, result]) 
+    except ValueError: # If amount was not float value or invalid currency code
+        return jsonify([False, ProtocolErrors.INVALID_CURRENCY_CODE.value])  
 
 
 @app.route('/search', methods=['GET'])
@@ -56,7 +54,10 @@ def translate():
     if not (text and dest_lang):
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     # Can't think of a specific exception case currently, might need to add later
-    res = server_features_handler.translate(text,dest_lang)
+    try:
+        res = server_features_handler.translate(text,dest_lang)
+    except ValueError:
+        return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
     return jsonify([True, res])
 
 

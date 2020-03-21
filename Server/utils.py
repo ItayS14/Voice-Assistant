@@ -8,9 +8,10 @@ import sqlalchemy as sqla
 import Server.config
 
 
+
 class Utils:
     chars_for_code = string.digits + string.ascii_uppercase
-
+    
     def __init__(self, code_len, max_seconds):
         self._code_len = code_len
         self._max_seconds = max_seconds
@@ -89,3 +90,5 @@ class Utils:
             recipients=[user.email],
             body=body)
         mail.send(msg)
+
+
