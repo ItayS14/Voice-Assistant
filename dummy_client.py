@@ -3,14 +3,17 @@ import json
 
 def main():
 	test = Session()   
-	#print('Register: ', test.register('abc','asfdF123123411','jday.david.2002@gmail.com').text)
-	#print('Login: ', test.login('abc', 'Aa1234567').text)
+	#print('Register: ', test.register('abc','asfdF123123411','jday.david.2002@gmail.com'))
+	print('Login: ', test.login('abc', 'asfdF123123411'))
 	#print('Profile: ', test.profile())
 	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
 	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
 	#print('New password: ', test.new_password('eyJ1c2VyX2lkIjoxfQ.XmAwMg.552pVgu2_gg4x0mpWj4rd_tbhjw','Aa1234567'))
-	print('Calculate:', test.calculate('5 + 5'))
-	#print('Logout: ', test.logout())
+	#print('Calculate:', test.calculate('5 + 5'))
+	#print('Translate:', test.translate('Hello world','HE'))
+	print('Search: ', test.search('Game of Thrones'))
+	print('Exchange: ', test.exchange('USD','EUR',15))
+	print('Logout: ', test.logout())
 
 
 class Session:
@@ -31,8 +34,7 @@ class Session:
 			'password': password,
 			'email': email
 		}
-		return self.session.post(self.server_url + '/register', register_data)
-
+		return self.session.post(self.server_url + '/register', register_data).json()
 
 	def login(self, auth, password):
 		"""
@@ -46,15 +48,14 @@ class Session:
 			'password': password,
 		}
 
-		return self.session.post(self.server_url + '/login', login_data)
-
+		return self.session.post(self.server_url + '/login', login_data).json()
 
 	def logout(self):
 		"""
 		The function will logout a user from the server
 		:return: requests.Response
 		"""
-		return self.session.get(self.server_url + '/logout')
+		return self.session.get(self.server_url + '/logout').json()
 
 	def translate(self,text,dest_lang):
 		"""
@@ -64,18 +65,17 @@ class Session:
 		:return: the translated text (str)
 		"""
 		data = {
-			'data': text,
-			'dest_lang': dest_lang
+			'text': text,
+			'lang': dest_lang
 		}
-		translated = self.session.get(self.server_url + "/translate",params=data).text
-		return json.loads(translated)[1] # [0] is True/False, [1] is the text
+		return  self.session.get(self.server_url + "/translate",params=data).json()
 		
 	def profile(self):
 		"""
 		The function will return a user's profile
 		:return: details about the specific user (dict)
 		"""
-		return json.loads(self.session.get(self.server_url + '/profile').text)
+		return self.session.get(self.server_url + '/profile').json()
 
 	def reset_password_request(self, email):
 		"""
@@ -86,7 +86,7 @@ class Session:
 		data = {
 			'email' : email
 		}
-		return json.loads(self.session.post(self.server_url + '/get_password_reset_token', data).text)
+		return self.session.post(self.server_url + '/get_password_reset_token', data).json()
 
 	def password_reset(self, code, email):
 		"""
@@ -99,7 +99,7 @@ class Session:
 			'code' : str(code),
 			'email': email
 		}
-		return json.loads(self.session.post(self.server_url + '/validate_code', data).text)
+		return self.session.post(self.server_url + '/validate_code', data).json()
 
 	def new_password(self, token, password):
 		"""
@@ -111,7 +111,7 @@ class Session:
 		data = {
 			'password': password
 		}
-		return json.loads(self.session.post(self.server_url + '/new_password/' + token,data).text)
+		return self.session.post(self.server_url + '/new_password/' + token,data).json()
 	
 	def calculate(self, expression):
 		"""
@@ -122,7 +122,31 @@ class Session:
 		data = {
 			'expression': expression
 		}
-		return json.loads(self.session.get(self.server_url + '/calculate',params=data).text)
+		return self.session.get(self.server_url + '/calculate',params=data).json()
 	
+	def exchange(self, from_coin, to_coin, amount):
+		"""
+		The function will exchange a coin
+		:param from_coin: the old currency (str)
+		:param to_coin: the currency to change to (str)
+		:param amount: the amount to change (int)
+		"""
+		data = {
+			'from_coin' : from_coin,
+			'to_coin': to_coin,
+			'amount': amount
+		}
+		return self.session.get(self.server_url + '/exchange', params=data).json()
+
+
+	def search(self, text):
+		"""
+		This function will search a certain expression in wikipedia
+		:param text: the text to search on wikipedia (str)
+		:return: the answer from wikipedia search about the term (str) 
+		"""
+		return self.session.get(self.server_url + f'/search?text={text}').json()
+
+
 if __name__ == '__main__':
 	main()

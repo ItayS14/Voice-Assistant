@@ -40,9 +40,7 @@ ServerMethods = Enum('ServerMethods', [
 ClientMethods = 1
 
 
-class InternetScrappersSettings():
-    SENTENCES_COUNT = 2
-    EXCHANGE_API_URL = r"https://api.exchangerate-api.com/v4/latest/"
+internet_features_handler_config = {'sentence_count': 2}
 
 
 class ValidatorsSettings():

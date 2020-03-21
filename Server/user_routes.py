@@ -3,7 +3,6 @@ from flask import request, jsonify
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.validators import *
-import Server.internet_scrappers as internet_scrappers
 from Server.config import ProtocolErrors
 from Server.utils import send_reset_email, verify_code, send_email_verification
 
