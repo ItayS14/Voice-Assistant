@@ -1,14 +1,11 @@
 from Server import app, db, bcrypt, mail
-from flask import request, jsonify, url_for
+from flask import request, jsonify
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.validators import *
 import Server.internet_scrappers as internet_scrappers
-import Server.translate, Server.calculator
-from Server.calculator import calculate
-from Server.config import ProtocolErrors, ProtocolException
-import Server.nlp
-from Server.utils import send_reset_email,verify_code, send_email_verification
+from Server.config import ProtocolErrors
+from Server.utils import send_reset_email, verify_code, send_email_verification
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -31,17 +28,20 @@ def register():
     # add custom error msg later
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
 
+
 @app.route('/validate_email/<token>')
 def validate_email_token(token):
     email = request.form.get('email')
     if not email:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+    
     user = User.query.filter_by(email=email)
     if not user:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value]) 
-    
+
     user.confirmed = True
     db.session.commit()
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -79,12 +79,15 @@ def get_password_reset_token():
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
+ 
     email = request.form.get('email')
     if not email:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+    
     user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+  
     send_reset_email(user)
     
     return jsonify([True, {}])
@@ -105,13 +108,12 @@ def validate_code():
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     
-
     if not verify_code(user,code):
         return jsonify([False, ProtocolErrors.INVALID_RESET_CODE.value])
 
     token = user.get_token('PASSWORD_RESET')
-
     return jsonify([True, {'token' : str(token)}])
+    
     
 @app.route('/new_password/<token>',methods=['POST'])
 def new_password(token):
@@ -137,62 +139,6 @@ def new_password(token):
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
     
 
-
-@app.route('/exchange', methods=['GET'])
-@login_required
-def exchange():
-    if not current_user.is_active:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
-    amount = request.args.get('amount')
-    to_coin = request.args.get('to_coin')
-    from_coin = request.args.get('from_coin')
-
-    if not (amount and to_coin and from_coin):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-    
-    try:
-        result = internet_scrappers.coin_exchange(from_coin, to_coin, float(amount))
-        return jsonify([True, result]) # For example: [True, 3]
-    except internet_scrappers.InvalidCurrencyCode: 
-        return jsonify([False, ProtocolErrors.INVALID_CURRENCY_CODE.value])
-    except ValueError: # If amount was not float value 
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])  
-
-
-@app.route('/search', methods=['GET'])
-@login_required
-def search():
-    if not current_user.is_active:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
-    text = request.args.get('text')
-
-    if not text:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-    try:
-        res = internet_scrappers.wiki_search(text)
-        return jsonify([True, res])
-    except internet_scrappers.NoResultsFound: # There are no results for that key
-        return jsonify([False, ProtocolErrors.NO_RESULTS_FOUND.value])
-
-
-@app.route('/translate', methods=['GET'])
-@login_required
-def translate():
-    if not current_user.is_active:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
-    text = request.args.get('text')
-    dest_lang = request.args.get('lang')
-
-    if not (text and dest_lang):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-    # Can't think of a specific exception case currently, might need to add later
-    res = Server.translate.translate(text,dest_lang)
-    return jsonify([True, res])
-    
-
 @app.route('/profile', methods=['GET'])
 @login_required
 def profile():
@@ -208,35 +154,3 @@ def profile():
         'image': user.profile_image # Need to send the actual data and not only the string
     }])    
 
-@app.route('/calculate',methods=['GET'])
-@login_required
-def calculate():
-    if not current_user.is_active:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
-    expression = request.args.get('expression')
-    if not expression:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-    res = None
-    try:
-        res = Server.calculator.calculate(expression)
-    except Exception:
-        return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
-    return jsonify([True, res])
-
-@app.route('/parse/<text>', methods=['GET'])
-@login_required
-def parse(text):
-    if not current_user.is_active:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
-    try:
-        res = Server.nlp.parse(text)
-        print(res)
-        data = res[0](res[1])
-        return jsonify([True,data])
-    except ProtocolException as e:
-        return jsonify([False, e._error.value])
-
-# NOTE: how should we use the is_active method for current_user?
-# NOTE: the login process should be diffrent for API?

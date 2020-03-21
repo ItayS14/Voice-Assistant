@@ -4,6 +4,8 @@ from flask_mail import Message
 from Server import mail, db
 from Server.models import User
 import datetime
+import sqlalchemy as sqla
+import Server.config
 
 PASSWORD_RESET_CODE_LEN = 6
 TIMESTAMP_TO_INT = 1000000
@@ -17,7 +19,7 @@ def generate_random_code(user):
     :param user: the user to add the code to, in the codes dict (User)
     :return: a code to be sent to the user (str)
     """
-    code = ''.join(random.choice(CHARS) for i in range(PASSWORD_RESET_CODE_LEN))
+    code = ''.join(random.sample(CHARS, PASSWORD_RESET_CODE_LEN))
     # Even if there already exists a code for the client, a new one is generated
     user.reset_code = code
     time = int(datetime.datetime.now().timestamp() * TIMESTAMP_TO_INT)
@@ -25,20 +27,32 @@ def generate_random_code(user):
     db.session.commit()
     return code
 
+def send_mail(subject, body, user):
+    """
+    This function will send a mail to a user with a specified body and title
+    :param subject: the title of the mail to be sent (str)
+    :param body: the body/message of the mail to be sent (str)
+    :param user: the user to send the mail to (User)
+    :return: None
+    """
+    msg = Message(
+        subject,
+        sender = 'noreply@carmelvoiceassistant.com',
+        recipients=[user.email],
+        body=body)
+    mail.send(msg)
+
 def send_reset_email(user):
     """
     The function will send reset email to user
     :param user: The user to send the maill to (User class)
     """
     code = generate_random_code(user)
-    msg = Message(f'Your Password Reset Code is - {code}',
-                  sender='noreply@carmelvoiceassistant.com',
-                  recipients=[user.email])
-    # Direct the user to the password reset route (may need to change this to open the flutter app later)
-    msg.body = f'''To reset your password, please enter the following code: {code}, in the application screen in front of you.
+    title = f'Your Password Reset Code is - {code}'
+    body = f'''To reset your password, please enter the following code: {code}, in the application screen in front of you.
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
-    mail.send(msg)
+    send_mail(title, body, user)
 
 def send_email_verification(user):
     """
@@ -47,15 +61,13 @@ def send_email_verification(user):
     """
     token = user.get_token('EMAIL_VALIDATION')
     url = f'http://localhost:5000/validate_email/{token}'
-    msg = Message(f'Hey {user.username}, thanks for signing up to our application',
-                    sender='noreply@carmelvoiceassistant.com',
-                    recipients=[user.email])
-    msg.body = f'''In order to start using our application you must click on the link below in order to activate your account:
+    title = f'Hey {user.username}, thanks for signing up to our application'
+    body = f'''In order to start using our application you must click on the link below in order to activate your account:
     {url}
     '''
-    mail.send(msg)
-    
-def verify_code(user,code):
+    send_mail(title, body, user)
+
+def verify_code(user, code):
     """
     This function will verify that a code is valid and in the correct time
     :param user: the user to check the code for (User)
@@ -73,7 +85,3 @@ def verify_code(user,code):
         return False
     # Check if the code is valid code
     return True if db_code and db_code == code else False
-
-    
-    
-
