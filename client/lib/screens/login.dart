@@ -6,6 +6,7 @@ import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:client/utils/network.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -42,7 +43,15 @@ class LoginPageState extends State<LoginPage> {
               ),
               Text("Remember me")
             ]),
-            FlatButton(child: Text('Forgot password?'))
+            FlatButton(
+              child: Text(
+                'Forgot password?',
+                style: GoogleFonts.quicksand(),
+                ),
+              onPressed: () {
+               Navigator.pushNamed(context, '/pass_reset');
+             },
+             )
         ]),
         SizedBox(height: 15),
         AppButton(
