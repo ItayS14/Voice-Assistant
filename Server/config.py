@@ -11,13 +11,14 @@ class Config:
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
-PASSWORD_RESET_CODE_LEN = 6
-
 ProtocolErrors = Enum('ProtocolErrors', [
     'INVALID_PARAMETERS',
     'USER_ALREADY_LOGGED',
     'INVALID_CREDENTIALS',
     'USER_NOT_LOGGED',
+    'INVALID_PASSWORD',
+    'INVALID_EMAIL',
+    'INVALID_USERNAME',
     'PARAMETERS_DO_NOT_MATCH_REQUIREMENTS',
     'INVALID_TOKEN',
     'INVALID_CURRENCY_CODE',
@@ -40,14 +41,18 @@ ServerMethods = Enum('ServerMethods', [
 ClientMethods = 1
 
 
-class InternetScrappersSettings():
-    SENTENCES_COUNT = 2
-    EXCHANGE_API_URL = r"https://api.exchangerate-api.com/v4/latest/"
+server_features_handler_config = {'sentence_count': 2}
 
 
-class ValidatorsSettings():
-    MAX_PASSWORD_LEN = 32
-    MIN_PASSWORD_LEN = 8
+validators_config = {
+    'max_password_len': 32,
+    'min_password_len': 8
+}
+
+utils_config = {
+    'code_len': 6,
+    'max_seconds': 60 * 30 # 30 Minutes with 60 seconds
+}
 
 
 class NLPSettings(): # Settings for the nlp module
