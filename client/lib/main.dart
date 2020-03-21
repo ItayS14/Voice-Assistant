@@ -1,7 +1,9 @@
+import 'package:client/screens/pass_reset.dart';
 import 'package:flutter/material.dart';
 import 'package:client/screens/login.dart';
 import 'package:client/screens/register.dart';
 import 'package:client/scaffold_setup.dart';
+import 'package:client/screens/validate_code.dart';
 
 void main() => runApp(MyApp());
 
@@ -21,6 +23,8 @@ class MyAppState extends State<MyApp>{
           '/main' : (_) => ScaffoldSetup(), 
           '/login' : (_) => _scaffoldWrap(LoginPage()),
           '/register': (_) => _scaffoldWrap(RegisterPage()),
+          '/pass_reset': (_) => _scaffoldWrap((PassResetPage())),
+          '/validate_code': (_) => _scaffoldWrap(ValidateCodePage(email:'abcdef')),
         },
       );
     }

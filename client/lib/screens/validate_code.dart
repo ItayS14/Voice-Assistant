@@ -1,25 +1,28 @@
-import 'package:client/screens/validate_code.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/app_form.dart';
 import 'package:client/custom_widgets/app_button.dart';
 import 'package:client/custom_widgets/bottom_button.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:client/utils/network.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 // CupertinoActivityIndicator
-
-class PassResetPage extends StatelessWidget {
+class CodeScreenArguments {
+  final String email;
+  CodeScreenArguments(this.email);
+}
+class ValidateCodePage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  String email = "";
+  final String email;
+  String code;
   
-  PassResetPage({Key key}) : super(key: key);
+  ValidateCodePage({Key key, @required this.email}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final CodeScreenArguments args = ModalRoute.of(context).settings.arguments;
     return AppTemplate(
       widgets: <Widget>[
         Container(
@@ -27,39 +30,35 @@ class PassResetPage extends StatelessWidget {
           alignment: Alignment.center,
           height: MediaQuery.of(context).size.height * 0.5
         ),
+        Text(
+          'A 6-characters code has been sent to your email. Check it out and put it right here.',
+           style: GoogleFonts.lora(),
+         ),
+        SizedBox(height: 30),
         Form(
           key: _formKey,
           child: AppForm(
-            hint: "Enter your email",
-            onSaved: (input) => email = input,
-          )  
+            hint: 'Please enter the code here',
+            onSaved: (input) => code=input,
+          )
         ),
         SizedBox(height: 30),
         AppButton(
           text: 'Submit',
           func: () {
             _sendRequest(context);
-            //Alert(context: context, title: "Server Error", desc: '$email', type: AlertType.error).show(); //For now
-                       
+            Alert(context: context, title: "Server Error", desc: '$email', type: AlertType.error).show(); //For now       
           },
-        ),
-        SizedBox(height: 20),
-        BottomButton(
-          text: "Remember your password?",
-          buttonText: "Go Back",
-          onPressed: () => Navigator.of(context).pop()
-        )
+         ),
       ]
     );
   }
   _sendRequest(BuildContext context) {
     _formKey.currentState.save();
-    getPasswordResetToken(email).then((res) {
+    validateCode(code,email).then((res) {
       if (res[0]) {
-        Navigator.pushNamed( context,
-        '/validate_code',
-         arguments: CodeScreenArguments(email)
-         );
+        print(res);
+        Navigator.of(context).pushNamed('/new_password');
       } else {
         Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
       }
