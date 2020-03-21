@@ -1,4 +1,4 @@
-from Server.config import Config, server_features_handler_config, validators_config 
+from Server.config import Config, server_features_handler_config, validators_config, utils_config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -18,8 +18,9 @@ server_features_handler = ServerFeaturesHandler(**server_features_handler_config
 nlp = spacy.load('en_core_web_sm')
 
 from Server.validators import Validators
+from Server.utils import Utils
 
+utils = Utils(**utils_config)
 validators_handler = Validators(**validators_config)
-
 
 from Server import user_routes, features_routes

@@ -1,10 +1,8 @@
-from Server import app, db, bcrypt, mail, validators_handler
+from Server import app, db, bcrypt, mail, validators_handler, utils
 from flask import request, jsonify
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
-from Server.validators import *
 from Server.config import ProtocolErrors
-from Server.utils import send_reset_email, verify_code, send_email_verification
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -22,7 +20,7 @@ def register():
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
         db.session.commit()
-        send_email_verification(user)
+        utils.send_email_verification(user)
         return jsonify([True, {}])
     # add custom error msg later
     return jsonify([False, ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS.value])
@@ -87,7 +85,7 @@ def get_password_reset_token():
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
   
-    send_reset_email(user)
+    utils.send_reset_email(user)
     
     return jsonify([True, {}])
 
@@ -107,7 +105,7 @@ def validate_code():
     if user is None:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     
-    if not verify_code(user,code):
+    if not utils.verify_code(user,code):
         return jsonify([False, ProtocolErrors.INVALID_RESET_CODE.value])
 
     token = user.get_token('PASSWORD_RESET')

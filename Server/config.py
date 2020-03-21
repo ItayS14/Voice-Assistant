@@ -48,6 +48,11 @@ validators_config = {
     'min_password_len': 8
 }
 
+utils_config = {
+    'code_len': 6,
+    'max_seconds': 60 * 30 # 30 Minutes with 60 seconds
+}
+
 
 class NLPSettings(): # Settings for the nlp module
     command_dict = {
