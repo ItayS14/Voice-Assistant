@@ -43,9 +43,10 @@ ClientMethods = 1
 server_features_handler_config = {'sentence_count': 2}
 
 
-class ValidatorsSettings():
-    MAX_PASSWORD_LEN = 32
-    MIN_PASSWORD_LEN = 8
+validators_config = {
+    'max_password_len': 32,
+    'min_password_len': 8
+}
 
 
 class NLPSettings(): # Settings for the nlp module

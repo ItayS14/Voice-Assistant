@@ -1,4 +1,4 @@
-from Server import app, db, bcrypt, mail
+from Server import app, db, bcrypt, mail, validators_handler
 from flask import request, jsonify
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
@@ -17,7 +17,7 @@ def register():
     if not (username and email and password):
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
-    if validate_username(username) and validate_email(email) and validate_password(password):
+    if validators_handler.username(username) and validators_handler.email(email) and validators_handler.password(password):
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
@@ -129,7 +129,7 @@ def new_password(token):
         return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
 
     # Make sure that password is strong enough and create new hash
-    if validate_password(new_password):
+    if validators_handler.password(new_password):
         hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
