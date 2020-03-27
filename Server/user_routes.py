@@ -1,5 +1,5 @@
 from Server import app, db, bcrypt, mail, validators_handler, utils
-from flask import request, jsonify
+from flask import request, jsonify, url_for
 from Server.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors
@@ -152,6 +152,6 @@ def profile():
     return jsonify([True,{
         'username': user.username,
         'email': user.email,
-        'image': user.profile_image # Need to send the actual data and not only the string
+        'image': url_for('static', filename=f'profile_pics/{user.profile_image}', _external=True) 
     }])    
 
