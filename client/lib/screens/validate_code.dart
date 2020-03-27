@@ -26,13 +26,17 @@ class ValidateCodePage extends StatelessWidget {
     final CodeScreenArguments args = ModalRoute.of(context).settings.arguments;
     return AppTemplate(
       widgets: <Widget>[
-        IconButton(
+        Align(
+        alignment: Alignment.topLeft,      
+        child: IconButton(
         icon: Icon(Icons.home),
         onPressed: () {
           Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
         },
         tooltip: 'Go back home',
-        color: Colors.red,
+        color: Colors.teal,
+        iconSize: 40,
+        ),
         ),
         Container(
           child: Image.asset('assets/voice_asistant_icon.png', scale: 2),
