@@ -1,6 +1,6 @@
 import 'package:requests/requests.dart';
 
-const SERVER_URL = 'http://10.0.0.24:5000';
+const SERVER_URL = 'http://10.0.2.2:5000';
 const ROUTES = ['translate', 'exchange', 'search', 'calculate'];
 // The function will login a user to the app
 dynamic login(String auth, String password) async {
@@ -85,6 +85,11 @@ dynamic serverMethods(Map<String, dynamic> params) async {
   String paramsEncoded = encodeMap(params["params"]);
   final res = await Requests.get('$SERVER_URL/$route?$paramsEncoded');
   print('$SERVER_URL/$route?$paramsEncoded');
+  return res.json();
+}
+
+dynamic profile() async {
+  final res = await Requests.get('$SERVER_URL/profile');
   return res.json();
 }
 

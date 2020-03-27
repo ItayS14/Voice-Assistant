@@ -3,11 +3,21 @@ import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/profile_text_box.dart';
 import 'package:client/utils/network.dart';
 
+class ProfileArguments {
+  final String img_url;
+  final String username;
+  final String email;
+
+  ProfileArguments({this.img_url, this.username, this.email});
+}
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final ProfileArguments args = ModalRoute.of(context).settings.arguments;
+    
     return AppTemplate(
       widgets: <Widget>[
         Stack(
@@ -29,12 +39,12 @@ class ProfilePage extends StatelessWidget {
         ),
         ProfileTextBox(
                     header: 'Username',
-                    text: 'Test Username'
+                    text: args.username
                   ),
         SizedBox(height: MediaQuery.of(context).size.height * 0.03),
         ProfileTextBox(
           header: 'Email',
-          text: 'test@gmail.com'
+          text: args.email
         )
       ],
     );

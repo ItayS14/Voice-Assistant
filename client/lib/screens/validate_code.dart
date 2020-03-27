@@ -13,20 +13,27 @@ class CodeScreenArguments {
   final String email;
   CodeScreenArguments(this.email);
 }
+
 class ValidateCodePage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final int codeLen = 6;
-  String email;
   String code;
-  
-  ValidateCodePage({Key key, @required this.email}) : super(key: key);
+
+  ValidateCodePage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final CodeScreenArguments args = ModalRoute.of(context).settings.arguments;
-    this.email = args.email;
     return AppTemplate(
       widgets: <Widget>[
+        IconButton(
+        icon: Icon(Icons.home),
+        onPressed: () {
+          Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
+        },
+        tooltip: 'Go back home',
+        color: Colors.red,
+        ),
         Container(
           child: Image.asset('assets/voice_asistant_icon.png', scale: 2),
           alignment: Alignment.center,
@@ -49,13 +56,13 @@ class ValidateCodePage extends StatelessWidget {
         AppButton(
           text: 'Submit',
           func: () {
-            _sendRequest(context);  
+            _sendRequest(context, args.email);  
           },
          ),
       ]
     );
   }
-  _sendRequest(BuildContext context) {
+  _sendRequest(BuildContext context, String email) {
     _formKey.currentState.save();
     validateCode(code,email).then((res) {
       if (res[0]) {

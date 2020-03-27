@@ -25,8 +25,8 @@ class MyAppState extends State<MyApp>{
           '/login' : (_) => _scaffoldWrap(LoginPage()),
           '/register': (_) => _scaffoldWrap(RegisterPage()),
           '/pass_reset': (_) => _scaffoldWrap((PassResetPage())),
-          '/validate_code': (_) => _scaffoldWrap(ValidateCodePage(email:null)),
-          '/new_password': (_) => _scaffoldWrap(NewPasswordPage(token: null))
+          '/validate_code': (_) => _scaffoldWrap(ValidateCodePage()),
+          '/new_password': (_) => _scaffoldWrap(NewPasswordPage())
         },
       );
     }

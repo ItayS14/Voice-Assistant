@@ -7,6 +7,7 @@ import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:client/utils/network.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:client/screens/profile.dart';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -70,9 +71,12 @@ class LoginPageState extends State<LoginPage> {
   _login() {
     _formKey.currentState.save();
     login(_auth, _password).then((res) {
-      print(res);
       if (res[0]) {
-        Navigator.of(context).pushNamed('/main');
+        profile().then((profileRes) {
+          Navigator.pushNamed(context,
+          '/main',
+          arguments: ProfileArguments(img_url: '', username: profileRes[1]['username'], email: profileRes[1]['email']));
+          });
       } else {
         Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
       }

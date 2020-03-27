@@ -14,15 +14,13 @@ class NewPassScreenArguments {
 }
 class NewPasswordPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  String token;
   String newPassword;
   
-  NewPasswordPage({Key key, @required this.token}) : super(key: key);
+  NewPasswordPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final NewPassScreenArguments args = ModalRoute.of(context).settings.arguments;
-    this.token = args.token;
     return AppTemplate(
       widgets: <Widget>[
         Container(
@@ -40,19 +38,20 @@ class NewPasswordPage extends StatelessWidget {
           child: AppForm(
             hint: 'Enter the password',
             onSaved: (input) => newPassword = input,
+            isPassword: true,
           )
         ),
         SizedBox(height: 30),
         AppButton(
           text: 'Submit',
           func: () {
-            _sendRequest(context);  
+            _sendRequest(context, args.token);  
           },
          ),
       ]
     );
   }
-  _sendRequest(BuildContext context) {
+  _sendRequest(BuildContext context, String token) {
     _formKey.currentState.save();
     newPasswordRequest(token,newPassword).then((res) {
       if (res[0]) {
