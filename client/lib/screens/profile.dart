@@ -27,7 +27,7 @@ class ProfilePage extends StatelessWidget {
               top: MediaQuery.of(context).size.height * 0.17,
               left: 38,
               child: CircleAvatar(
-                backgroundImage: NetworkImage('https://avatars0.githubusercontent.com/u/8264639?s=460&v=4'),
+                backgroundImage: NetworkImage(args.img_url),
                 radius: 120 // Change this to be fitted to screen size
               )
             ),

@@ -75,7 +75,7 @@ class LoginPageState extends State<LoginPage> {
         profile().then((profileRes) {
           Navigator.pushNamed(context,
           '/main',
-          arguments: ProfileArguments(img_url: '', username: profileRes[1]['username'], email: profileRes[1]['email']));
+          arguments: ProfileArguments(img_url: profileRes[1]['image'], username: profileRes[1]['username'], email: profileRes[1]['email']));
           });
       } else {
         Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
