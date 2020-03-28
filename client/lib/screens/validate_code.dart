@@ -7,6 +7,7 @@ import 'package:client/custom_widgets/app_button.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:client/utils/network.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:client/config.dart';
 
 // CupertinoActivityIndicator
 class CodeScreenArguments {
@@ -75,7 +76,7 @@ class ValidateCodePage extends StatelessWidget {
           arguments: NewPassScreenArguments(res[1]['token']),
           );
       } else {
-        Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
       }
     });
   }

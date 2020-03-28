@@ -5,6 +5,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:client/utils/network.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:client/config.dart';
 
 class SpeechRecognitionScreen extends StatefulWidget {
   SpeechRecognitionScreen({Key key}) : super(key: key);
@@ -87,18 +88,18 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
           _infoAlert(newRes[1]);
         }
         else {
-          _errorAlert(newRes);
+          _errorAlert(newRes[1]);
         }
       });
     }
     else {
-      _errorAlert(res);
+      _errorAlert(res[1]);
     }
 
   }
 
-  _errorAlert(text){
-    Alert(context: context, title: 'Error', desc: '$text', type: AlertType.error).show();
+  _errorAlert(code){
+    Alert(context: context, title: 'Error', desc: ProtocolErrors[code-1], type: AlertType.error).show();
     _tts.speak('Sorry, that command is not supported');
   }
 

@@ -7,6 +7,7 @@ import 'package:client/custom_widgets/app_button.dart';
 import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:client/utils/network.dart';
+import 'package:client/config.dart';
 
 
 // CupertinoActivityIndicator
@@ -59,7 +60,7 @@ class PassResetPage extends StatelessWidget {
          arguments: CodeScreenArguments(email)
          );
       } else {
-        Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
       }
     });
   }

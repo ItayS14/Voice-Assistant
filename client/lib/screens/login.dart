@@ -8,6 +8,7 @@ import 'package:client/utils/network.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:client/screens/profile.dart';
+import 'package:client/config.dart';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -78,7 +79,7 @@ class LoginPageState extends State<LoginPage> {
           arguments: ProfileArguments(img_url: '', username: profileRes[1]['username'], email: profileRes[1]['email']));
           });
       } else {
-        Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
       }
     });
   }

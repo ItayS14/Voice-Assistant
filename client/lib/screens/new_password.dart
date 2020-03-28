@@ -1,3 +1,4 @@
+import 'package:client/config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:client/app_template.dart';
@@ -71,7 +72,7 @@ class NewPasswordPage extends StatelessWidget {
         Alert(context: context, title: "Success", desc: 'You have successfully reset your password. You are now being sent to the login page.', type: AlertType.success).show(); //For now    
         Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
       } else {
-        Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
       }
     });
   }
