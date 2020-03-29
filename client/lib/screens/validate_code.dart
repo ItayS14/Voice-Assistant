@@ -7,6 +7,7 @@ import 'package:client/custom_widgets/app_button.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:client/utils/network.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:client/config.dart';
 
 // CupertinoActivityIndicator
 class CodeScreenArguments {
@@ -26,13 +27,17 @@ class ValidateCodePage extends StatelessWidget {
     final CodeScreenArguments args = ModalRoute.of(context).settings.arguments;
     return AppTemplate(
       widgets: <Widget>[
-        IconButton(
+        Align(
+        alignment: Alignment.topLeft,      
+        child: IconButton(
         icon: Icon(Icons.home),
         onPressed: () {
           Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
         },
         tooltip: 'Go back home',
-        color: Colors.red,
+        color: Colors.teal,
+        iconSize: 40,
+        ),
         ),
         Container(
           child: Image.asset('assets/voice_asistant_icon.png', scale: 2),
@@ -71,7 +76,7 @@ class ValidateCodePage extends StatelessWidget {
           arguments: NewPassScreenArguments(res[1]['token']),
           );
       } else {
-        Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
       }
     });
   }

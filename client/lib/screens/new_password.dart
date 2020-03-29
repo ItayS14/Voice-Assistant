@@ -1,3 +1,4 @@
+import 'package:client/config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:client/app_template.dart';
@@ -23,6 +24,18 @@ class NewPasswordPage extends StatelessWidget {
     final NewPassScreenArguments args = ModalRoute.of(context).settings.arguments;
     return AppTemplate(
       widgets: <Widget>[
+        Align(
+        alignment: Alignment.topLeft,      
+        child: IconButton(
+        icon: Icon(Icons.home),
+        onPressed: () {
+          Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
+        },
+        tooltip: 'Go back home',
+        color: Colors.teal,
+        iconSize: 40,
+        ),
+        ),
         Container(
           child: Image.asset('assets/voice_asistant_icon.png', scale: 2),
           alignment: Alignment.center,
@@ -59,7 +72,7 @@ class NewPasswordPage extends StatelessWidget {
         Alert(context: context, title: "Success", desc: 'You have successfully reset your password. You are now being sent to the login page.', type: AlertType.success).show(); //For now    
         Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
       } else {
-        Alert(context: context, title: "Server Error", desc: '$res', type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
       }
     });
   }
