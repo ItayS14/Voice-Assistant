@@ -79,7 +79,7 @@ class LoginPageState extends State<LoginPage> {
           arguments: ProfileArguments(img_url: profileRes[1]['image'], username: profileRes[1]['username'], email: profileRes[1]['email']));
           });
       } else {
-        Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
       }
     });
   }

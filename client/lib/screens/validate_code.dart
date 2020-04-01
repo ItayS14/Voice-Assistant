@@ -76,7 +76,7 @@ class ValidateCodePage extends StatelessWidget {
           arguments: NewPassScreenArguments(res[1]['token']),
           );
       } else {
-        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1] - 1], type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
       }
     });
   }
