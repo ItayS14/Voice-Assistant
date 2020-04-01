@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:client/app_form.dart';
-import 'package:client/app_button.dart';
-import 'package:client/login_system_template.dart';
-import 'package:client/bottom_button.dart';
-import 'package:requests/requests.dart';
+import 'package:client/custom_widgets/app_form.dart';
+import 'package:client/custom_widgets/app_button.dart';
+import 'package:client/app_template.dart';
+import 'package:client/custom_widgets/bottom_button.dart';
+import 'package:client/utils/network.dart';
+
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return LoginSystemTemplate(
+    return AppTemplate(
       widgets: <Widget>[
         SizedBox(height: 30),
         Image.asset('assets/voice_asistant_icon.png', scale: 3),
@@ -44,22 +45,16 @@ class RegisterPageState extends State<RegisterPage> {
   }
   
   //The function will register to the app
-  _register() async {
+  _register() {
     _formKey.currentState.save();
     if (_formKey.currentState.validate())
     {
-      final res = await Requests.post('http://10.0.2.2:5000/register', 
-      body: {
-        'username': _username, 
-        'password': _password,
-        'email': _email
-      }, 
-      bodyEncoding: RequestBodyEncoding.FormURLEncoded); 
-      final data = res.json();
-      if (data[0])
-        Alert(context: context, title: "Registered successfully", type: AlertType.success).show(); //For now
-      else
-        Alert(context: context, title: "Server Error", desc: '$data', type: AlertType.error).show(); //For now
+      register(_username, _password, _email).then((res) {
+        if (res[0])
+          Navigator.of(context).pop();
+        else
+          print('$res');
+      });
     }
   }
   //The function will build the forms of the register page

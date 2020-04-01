@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:circular_check_box/circular_check_box.dart';
-import 'package:client/app_form.dart';
-import 'package:client/app_button.dart';
-import 'package:client/login_system_template.dart';
-import 'package:client/bottom_button.dart';
-import 'package:requests/requests.dart';
+import 'package:client/custom_widgets/app_form.dart';
+import 'package:client/custom_widgets/app_button.dart';
+import 'package:client/app_template.dart';
+import 'package:client/custom_widgets/bottom_button.dart';
+import 'package:client/utils/network.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:client/screens/profile.dart';
+import 'package:client/config.dart';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -19,7 +22,7 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context){
-    return LoginSystemTemplate(
+    return AppTemplate(
       widgets: <Widget>[
         SizedBox(height: 60),
         Image.asset('assets/voice_asistant_icon.png', scale: 3),
@@ -42,7 +45,15 @@ class LoginPageState extends State<LoginPage> {
               ),
               Text("Remember me")
             ]),
-            FlatButton(child: Text('Forgot password?'))
+            FlatButton(
+              child: Text(
+                'Forgot password?',
+                style: GoogleFonts.quicksand(),
+                ),
+              onPressed: () {
+               Navigator.pushNamed(context, '/pass_reset');
+             },
+             )
         ]),
         SizedBox(height: 15),
         AppButton(
@@ -58,27 +69,19 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  _login() async {
+  _login() {
     _formKey.currentState.save();
-    final res = await Requests.post('http://10.0.2.2:5000/login', 
-    body: {
-      'auth': _auth, 
-      'password': _password
-    }, 
-    bodyEncoding: RequestBodyEncoding.FormURLEncoded);
-
-    final data = res.json();
-    print(data);
-    if (data[0]) // Action success
-    {
-      Alert(context: context, title: "Logged in", type: AlertType.success).show(); //For now
-      final res = await Requests.get('http://10.0.2.2:5000/logout');
-      print('Logging out');
-      print(res.json());
-    }
-    else{
-      Alert(context: context, title: "Server Error", desc: '$data', type: AlertType.error).show(); //For now
-    }
+    login(_auth, _password).then((res) {
+      if (res[0]) {
+        profile().then((profileRes) {
+          Navigator.pushNamed(context,
+          '/main',
+          arguments: ProfileArguments(img_url: profileRes[1]['image'], username: profileRes[1]['username'], email: profileRes[1]['email']));
+          });
+      } else {
+        Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
+      }
+    });
   }
 
   //The function will build the forms for the login screen
