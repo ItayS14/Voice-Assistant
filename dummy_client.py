@@ -3,16 +3,14 @@ import json
 
 def main():
 	test = Session()   
-	#print('Register: ', test.register('abc','asfdF123123411','jday.david.2002@gmail.com'))
+	print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
 	print('Login: ', test.login('abc', 'asfdF123123411'))
-	#print('Profile: ', test.profile())
+	print('Profile: ', test.profile())
 	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
 	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
 	#print('New password: ', test.new_password('eyJ1c2VyX2lkIjoxfQ.XmAwMg.552pVgu2_gg4x0mpWj4rd_tbhjw','Aa1234567'))
 	#print('Calculate:', test.calculate('5 + 5'))
 	#print('Translate:', test.translate('Hello world','HE'))
-	print('Search: ', test.search('Game of Thrones'))
-	print('Exchange: ', test.exchange('USD','EUR',15))
 	print('Logout: ', test.logout())
 
 
