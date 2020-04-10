@@ -1,6 +1,6 @@
 from Server import app, db, bcrypt, mail, validators_handler, utils
 from flask import request, jsonify, url_for
-from Server.models import User
+from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors
 
