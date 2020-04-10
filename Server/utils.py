@@ -8,6 +8,7 @@ import sqlalchemy as sqla
 from Server.config import ProtocolErrors
 from flask import request, jsonify
 from functools import wraps
+from flask_login import login_required, current_user
 
 def validate_params(*params, get):
     """
@@ -25,6 +26,17 @@ def validate_params(*params, get):
         return wrapper
     return _validate_params
 
+def activated_required(fnc):
+    """
+    Decorator that require the user to be login and activated
+    """
+    @login_required
+    @wraps(fnc)
+    def wrapper(*args, **kwargs):
+        if not current_user.confirmed:
+            return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+        return fnc(*args, **kwargs)
+    return wrapper
 
 class Utils:
     chars_for_code = string.digits + string.ascii_uppercase

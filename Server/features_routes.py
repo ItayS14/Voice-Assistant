@@ -4,15 +4,12 @@ from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
-from Server.utils import validate_params
+from Server.utils import validate_params, activated_required
 
 @app.route('/exchange', methods=['GET'])
-@login_required
+@activated_required
 @validate_params('amount', 'to_coin', 'from_coin', get=True)
 def exchange(amount, from_coin, to_coin):
-    if not current_user.confirmed:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
     try:
         result = server_features_handler.coin_exchange(from_coin, to_coin, float(amount))
         return jsonify([True, result]) 
@@ -21,21 +18,15 @@ def exchange(amount, from_coin, to_coin):
 
 
 @app.route('/search', methods=['GET'])
-@login_required
+@activated_required
 @validate_params('question', 'keywords', get=True)
 def search(question, keywords):
-    if not current_user.confirmed:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
     return jsonify([True, server_features_handler.search(question, keywords)])
 
 @app.route('/translate', methods=['GET'])
-@login_required
+@activated_required
 @validate_params('text', 'lang', get=True)
 def translate(text, dest_lang):
-    if not current_user.confirmed:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
     # Can't think of a specific exception case currently, might need to add later
     try:
         res = server_features_handler.translate(text,dest_lang)
@@ -45,12 +36,9 @@ def translate(text, dest_lang):
 
 
 @app.route('/calculate',methods=['GET'])
-@login_required
+@activated_required
 @validate_params('expression', get=True)
 def calculate(expression):
-    if not current_user.confirmed:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
     try:
         res = server_features_handler.calculate(expression)
     except Exception:
@@ -60,11 +48,8 @@ def calculate(expression):
 
 
 @app.route('/parse/<text>', methods=['GET'])
-@login_required
+@activated_required
 def parse(text):
-    if not current_user.confirmed:
-        return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
     try:
         res = Server.nlp.parse(text)
         print(res)
