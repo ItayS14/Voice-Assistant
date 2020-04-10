@@ -5,8 +5,25 @@ from Server import mail, db
 from Server.db_models import User
 import datetime
 import sqlalchemy as sqla
-import Server.config
+from Server.config import ProtocolErrors
+from flask import request, jsonify
+from functools import wraps
 
+def validate_params(*params, get):
+    """
+    Decorator that validate flask params
+    :param *params: every param to validate (list)
+    :param get: is it get or post request (bool)
+    """
+    def _validate_params(fnc):
+        @wraps(fnc)
+        def wrapper(*args, **kwargs):
+            params_to_fnc = [request.args.get(param) if get else request.form.get(param) for param in params]
+            if None in params_to_fnc:
+                return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+            return fnc(*args, *params_to_fnc, **kwargs)
+        return wrapper
+    return _validate_params
 
 
 class Utils:

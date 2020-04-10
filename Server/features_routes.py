@@ -4,21 +4,15 @@ from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
-
+from Server.utils import validate_params
 
 @app.route('/exchange', methods=['GET'])
 @login_required
-def exchange():
+@validate_params('amount', 'to_coin', 'from_coin', get=True)
+def exchange(amount, from_coin, to_coin):
     if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
-    amount = request.args.get('amount')
-    to_coin = request.args.get('to_coin')
-    from_coin = request.args.get('from_coin')
-
-    if not (amount and to_coin and from_coin):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-    
     try:
         result = server_features_handler.coin_exchange(from_coin, to_coin, float(amount))
         return jsonify([True, result]) 
@@ -28,27 +22,20 @@ def exchange():
 
 @app.route('/search', methods=['GET'])
 @login_required
-def search():
+@validate_params('question', 'keywords', get=True)
+def search(question, keywords):
     if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
-
-    question = request.args.get('question')
-    keywords = request.args.get('keywords')
-    if not question and keywords:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     return jsonify([True, server_features_handler.search(question, keywords)])
 
 @app.route('/translate', methods=['GET'])
 @login_required
-def translate():
+@validate_params('text', 'lang', get=True)
+def translate(text, dest_lang):
     if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
-    text = request.args.get('text')
-    dest_lang = request.args.get('lang')
-    if not (text and dest_lang):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     # Can't think of a specific exception case currently, might need to add later
     try:
         res = server_features_handler.translate(text,dest_lang)
@@ -59,19 +46,17 @@ def translate():
 
 @app.route('/calculate',methods=['GET'])
 @login_required
-def calculate():
+@validate_params('expression', get=True)
+def calculate(expression):
     if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
-    expression = request.args.get('expression')
-    if not expression:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-    res = None
     try:
         res = server_features_handler.calculate(expression)
     except Exception:
         return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
-    return jsonify([True, res])
+    else:
+        return jsonify([True, res])
 
 
 @app.route('/parse/<text>', methods=['GET'])
