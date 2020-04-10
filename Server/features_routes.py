@@ -1,6 +1,6 @@
 from Server import app, server_features_handler
 from flask import request, jsonify, url_for
-from Server.models import User
+from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors, ProtocolException
 import Server.nlp
@@ -9,7 +9,7 @@ import Server.nlp
 @app.route('/exchange', methods=['GET'])
 @login_required
 def exchange():
-    if not current_user.is_active:
+    if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
     amount = request.args.get('amount')
@@ -29,24 +29,20 @@ def exchange():
 @app.route('/search', methods=['GET'])
 @login_required
 def search():
-    if not current_user.is_active:
+    if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
-    text = request.args.get('text')
-    if not text:
+    question = request.args.get('question')
+    keywords = request.args.get('keywords')
+    if not question and keywords:
         return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
-    try:
-        res = server_features_handler.wiki_search(text)
-        return jsonify([True, res])
-    except server_features_handler.NoResultsFound: # There are no results for that key
-        return jsonify([False, ProtocolErrors.NO_RESULTS_FOUND.value])
-
+    return jsonify([True, server_features_handler.search(question, keywords)])
 
 @app.route('/translate', methods=['GET'])
 @login_required
 def translate():
-    if not current_user.is_active:
+    if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
     text = request.args.get('text')
@@ -64,7 +60,7 @@ def translate():
 @app.route('/calculate',methods=['GET'])
 @login_required
 def calculate():
-    if not current_user.is_active:
+    if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
     expression = request.args.get('expression')
@@ -81,7 +77,7 @@ def calculate():
 @app.route('/parse/<text>', methods=['GET'])
 @login_required
 def parse(text):
-    if not current_user.is_active:
+    if not current_user.confirmed:
         return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
 
     try:

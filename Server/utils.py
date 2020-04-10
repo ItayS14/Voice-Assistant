@@ -2,7 +2,7 @@ import random
 import string
 from flask_mail import Message
 from Server import mail, db
-from Server.models import User
+from Server.db_models import User
 import datetime
 import sqlalchemy as sqla
 import Server.config

@@ -1,4 +1,4 @@
-from Server.models import User
+from Server.db_models import User
 import string
 from validate_email import validate_email 
 

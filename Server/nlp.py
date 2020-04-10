@@ -21,7 +21,7 @@ def parse(text):
 	return (globals()[Settings.command_dict[first_token]], doc)
 
 
-def nlp_wiki(doc):
+def nlp_search(doc):
 	"""
 	The function will parse wiki question and return the parameter from the text query
 	:param doc: the query to parse (as Spacy doc)
@@ -34,7 +34,7 @@ def nlp_wiki(doc):
 	if not text:
 		r = [span.text for span in doc.noun_chunks] # In case that the sentence had no auxilary verbs grouping all noun chunks except the first one
 		text = ' '.join(r[1:])
-	params = {'text': text}
+	params = {'keywords': text,'question': str(doc)}
 	return {'route': ServerMethods.WIKI_SEARCH.value, 'params': params}
 
 

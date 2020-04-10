@@ -41,7 +41,10 @@ ServerMethods = Enum('ServerMethods', [
 ClientMethods = 1
 
 
-server_features_handler_config = {'sentence_count': 2}
+server_features_handler_config = {
+    'sentence_count': 2, 
+    'path_to_model': 'C:/Users/jdayd/Documents/VoiceAssistant/Server/saved.pt'
+}
 
 
 validators_config = {
@@ -60,14 +63,14 @@ class NLPSettings(): # Settings for the nlp module
     'exchange': 'nlp_coin_exchange',
     'translate': 'nlp_translate',
     'say': 'nlp_translate',
-    'tell': 'nlp_wiki',
+    'tell': 'nlp_search',
     'calculate': 'nlp_calculate'    
     }
     wh_dict = {
-        'what': 'nlp_wiki',
-        'who': 'nlp_wiki',
-        'where': 'nlp_wiki',
-        'which': 'nlp_wiki',
+        'what': 'nlp_search',
+        'who': 'nlp_search',
+        'where': 'nlp_search',
+        'which': 'nlp_search',
     }
     how_dict = {
         'much': 'determine_how_func',

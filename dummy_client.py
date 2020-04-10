@@ -3,14 +3,16 @@ import json
 
 def main():
 	test = Session()   
-	print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
+	#print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
 	print('Login: ', test.login('abc', 'asfdF123123411'))
-	print('Profile: ', test.profile())
+	#print('Profile: ', test.profile())
 	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
 	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
 	#print('New password: ', test.new_password('eyJ1c2VyX2lkIjoxfQ.XmAwMg.552pVgu2_gg4x0mpWj4rd_tbhjw','Aa1234567'))
 	#print('Calculate:', test.calculate('5 + 5'))
 	#print('Translate:', test.translate('Hello world','HE'))
+	print('Search: ', test.search('Who is the author of Game Of Thrones?','game of thrones'))
+	#print('Parse: ', test.parse('who is the author of game of thrones?'))
 	print('Logout: ', test.logout())
 
 
@@ -137,13 +139,16 @@ class Session:
 		return self.session.get(self.server_url + '/exchange', params=data).json()
 
 
-	def search(self, text):
+	def search(self, question,keywords):
 		"""
 		This function will search a certain expression in wikipedia
 		:param text: the text to search on wikipedia (str)
 		:return: the answer from wikipedia search about the term (str) 
 		"""
-		return self.session.get(self.server_url + f'/search?text={text}').json()
+		return self.session.get(self.server_url + f'/search?question={question}&keywords={keywords}').json()
+
+	def parse(self, text):
+		return self.session.get(self.server_url + f'/parse/{text}').json()
 
 
 if __name__ == '__main__':
