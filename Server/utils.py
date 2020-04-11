@@ -5,9 +5,38 @@ from Server import mail, db
 from Server.db_models import User
 import datetime
 import sqlalchemy as sqla
-import Server.config
+from Server.config import ProtocolErrors
+from flask import request, jsonify
+from functools import wraps
+from flask_login import login_required, current_user
 
+def validate_params(*params, get):
+    """
+    Decorator that validate flask params
+    :param *params: every param to validate (list)
+    :param get: is it get or post request (bool)
+    """
+    def _validate_params(fnc):
+        @wraps(fnc)
+        def wrapper(*args, **kwargs):
+            params_to_fnc = [request.args.get(param) if get else request.form.get(param) for param in params]
+            if None in params_to_fnc:
+                return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+            return fnc(*args, *params_to_fnc, **kwargs)
+        return wrapper
+    return _validate_params
 
+def activated_required(fnc):
+    """
+    Decorator that require the user to be login and activated
+    """
+    @login_required
+    @wraps(fnc)
+    def wrapper(*args, **kwargs):
+        if not current_user.confirmed:
+            return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+        return fnc(*args, **kwargs)
+    return wrapper
 
 class Utils:
     chars_for_code = string.digits + string.ascii_uppercase

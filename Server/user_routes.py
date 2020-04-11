@@ -3,17 +3,13 @@ from flask import request, jsonify, url_for
 from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors
+from Server.utils import validate_params
 
 @app.route('/register', methods=['POST'])
-def register():
+@validate_params('username', 'email', 'password', get=False)
+def register(username, email, password):
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
-
-    username = request.form.get('username')
-    password = request.form.get('password')
-    email = request.form.get('email')
-    if not (username and email and password):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     if not validators_handler.username(username):
         return jsonify([False, ProtocolErrors.INVALID_USERNAME.value]) 
@@ -32,28 +28,18 @@ def register():
 
 @app.route('/validate_email/<token>')
 def validate_email_token(token):
-    email = request.form.get('email')
-    if not email:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-    
-    user = User.query.filter_by(email=email)
+    user = User.verify_token(token, 'EMAIL_VALIDATION')
     if not user:
         return jsonify([False, ProtocolErrors.INVALID_EMAIL.value]) 
-
     user.confirmed = True
     db.session.commit()
-
+    return "Email is now validated!"
 
 @app.route('/login', methods=['POST'])
-def login():
+@validate_params('auth', 'password', get=False)
+def login(auth, password):
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
-
-    auth = request.form.get('auth')
-    password = request.form.get('password')
-    if not (auth and password):
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
-
     # Checking for both options (username validation or email validation)
     user = User.query.filter_by(email=auth).first()
     if not user:
@@ -76,14 +62,11 @@ def logout():
 
 
 @app.route("/get_password_reset_token", methods=['POST'])
-def get_password_reset_token():
+@validate_params('email', get=False)
+def get_password_reset_token(email):
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
- 
-    email = request.form.get('email')
-    if not email:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
     
     user = User.query.filter_by(email=email).first()
     if user is None:
@@ -94,16 +77,11 @@ def get_password_reset_token():
     return jsonify([True, {}])
 
 @app.route('/validate_code', methods=['POST'])
-def validate_code():
+@validate_params('code', 'email', get=False)
+def validate_code(code, email):
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
 
-    code = request.form.get('code')
-    # The email might not be neccesairy in this request, need to check
-    email = request.form.get('email')
-
-    if not email or not code:
-        return jsonify([False,ProtocolErrors.INVALID_PARAMETERS.value])
     # Used for creating a token
     user = User.query.filter_by(email=email).first()
     if user is None:
@@ -117,14 +95,11 @@ def validate_code():
     
     
 @app.route('/new_password/<token>',methods=['POST'])
-def new_password(token):
+@validate_params('password', get=False)
+def new_password(token, new_password):
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
-
-    new_password = request.form.get('password')
-    if not new_password:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
 
     user = User.verify_token(token, 'PASSWORD_RESET')
     if user is None:
