@@ -1,10 +1,12 @@
 import requests
 import json
+import base64
 
 def main():
 	test = Session()   
 	#print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
 	print('Login: ', test.login('abc', 'asfdF123123411'))
+	print('update img:', test.update_picture('sadf.txt'))
 	#print('Profile: ', test.profile())
 	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
 	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
@@ -150,6 +152,15 @@ class Session:
 	def parse(self, text):
 		return self.session.get(self.server_url + f'/parse/{text}').json()
 
+	def update_picture(self, picture_path):
+		with open(picture_path, 'rb') as f:
+			content = f.read()
+		content = base64.b64encode(content).decode('ascii')
+		data =  {
+			'img': content,
+			'file_name': picture_path.split('/')[-1]
+		}
+		return self.session.post(self.server_url + '/update_img', data)
 
 if __name__ == '__main__':
 	main()
