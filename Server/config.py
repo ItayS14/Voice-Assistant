@@ -43,7 +43,8 @@ ClientMethods = 1
 
 server_features_handler_config = {
     'sentence_count': 2, 
-    'path_to_model': 'C:/Users/jdayd/Documents/VoiceAssistant/Server/saved.pt'
+    'path_to_infersent': 'Server/QA_Test/models/infersent_trained.pt',
+    'path_to_xgboost': 'Server/QA_test/models/xgb.model'
 }
 
 

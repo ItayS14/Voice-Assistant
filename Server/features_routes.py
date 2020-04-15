@@ -3,7 +3,6 @@ from flask import request, jsonify, url_for
 from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors, ProtocolException
-import Server.nlp
 from Server.utils import validate_params, activated_required
 
 @app.route('/exchange', methods=['GET'])
@@ -18,7 +17,7 @@ def exchange(amount, from_coin, to_coin):
 
 
 @app.route('/search', methods=['GET'])
-@activated_required
+#@activated_required
 @validate_params('question', 'keywords', get=True)
 def search(question, keywords):
     return jsonify([True, server_features_handler.search(question, keywords)])
@@ -51,7 +50,7 @@ def calculate(expression):
 @activated_required
 def parse(text):
     try:
-        res = Server.nlp.parse(text)
+        res = Server.nlp_parsing.parse(text)
         print(res)
         data = res[0](res[1])
         return jsonify([True,data])
