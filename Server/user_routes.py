@@ -3,7 +3,9 @@ from flask import request, jsonify, url_for
 from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors
-from Server.utils import validate_params
+from Server.utils import validate_params, activated_required
+import base64
+import binascii
 
 @app.route('/register', methods=['POST'])
 @validate_params('username', 'email', 'password', get=False)
@@ -27,7 +29,7 @@ def register(username, email, password):
 
 
 @app.route('/validate_email/<token>')
-def validate_email_token(token):
+def validate_email(token):
     user = User.verify_token(token, 'EMAIL_VALIDATION')
     if not user:
         return jsonify([False, ProtocolErrors.INVALID_EMAIL.value]) 
@@ -129,4 +131,21 @@ def profile():
         'email': user.email,
         'image': url_for('static', filename=f'profile_pics/{user.profile_image}', _external=True) 
     }])    
+    
+
+@app.route('/update_img', methods=['POST'])
+@activated_required
+@validate_params('file_name','img', get=False)
+def update_img(file_name, img):
+    #TODO: validate types of inputs - Security issue
+    try:
+        raw_data = base64.b64decode(img)
+    except binascii.Error: 
+        return jsonify[False, ProtocolErrors.INVALID_BASE64_STRING.value]
+    else:
+        file_name = utils.save_picture(file_name, raw_data)
+        current_user.profile_image = file_name
+        db.session.commit()
+    return jsonify([True, {}])
+
 
