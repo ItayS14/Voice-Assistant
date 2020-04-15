@@ -1,6 +1,6 @@
 import pandas as pd
 
-train = pd.read_json("train-v2.0.json")
+train = pd.read_json("data/train-v2.0.json")
 
 contexts = []
 answers_text = []
@@ -18,4 +18,4 @@ for index in train.index:
 
 df = pd.DataFrame({"context":contexts, "question": questions, "answer_start": answers_start, "text": answers_text})
 
-df.to_csv("train.csv", index = None)
+df.to_csv("data/train.csv", index = None)
