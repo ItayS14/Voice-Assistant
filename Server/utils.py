@@ -1,14 +1,15 @@
 import random
 import string
 from flask_mail import Message
-from Server import mail, db
+from Server import mail, db, app
 from Server.db_models import User
 import datetime
-import sqlalchemy as sqla
 from Server.config import ProtocolErrors
-from flask import request, jsonify
+from flask import request, jsonify, url_for
 from functools import wraps
 from flask_login import login_required, current_user
+import os
+
 
 def validate_params(*params, get):
     """
@@ -26,6 +27,7 @@ def validate_params(*params, get):
         return wrapper
     return _validate_params
 
+
 def activated_required(fnc):
     """
     Decorator that require the user to be login and activated
@@ -38,12 +40,14 @@ def activated_required(fnc):
         return fnc(*args, **kwargs)
     return wrapper
 
+
 class Utils:
     chars_for_code = string.digits + string.ascii_uppercase
     
-    def __init__(self, code_len, max_seconds):
+    def __init__(self, code_len, max_seconds, pic_url):
         self._code_len = code_len
         self._max_seconds = max_seconds
+        self._pic_url = pic_url
 
     def send_reset_email(self, user):
         """
@@ -64,7 +68,7 @@ class Utils:
         :param user: The user to send the mail to (User)
         """
         token = user.get_token('EMAIL_VALIDATION')
-        url = f'http://localhost:5000/validate_email/{token}'
+        url =  url_for('validate_email', token=token, _external=True) 
         title = f'Hey {user.username}, thanks for signing up to our application'
         body = f'''In order to start using our application you must click on the link below in order to activate your account:
         {url}
@@ -120,4 +124,16 @@ class Utils:
             body=body)
         mail.send(msg)
 
-
+    def save_picture(self, file_name, content):
+        """
+        The function will save image to the server (image name would be the current_user username)
+        :param file_name: the file name on the client (need it for the extenstion) - str
+        :param content: the content to save - bytes
+        :return: file name of the saved picture
+        """
+        _, ext = os.path.splitext(file_name)
+        file_name = current_user.username + ext
+        path = os.path.join(app.root_path, self._pic_url, file_name)
+        with open(path, 'wb') as f:
+            f.write(content)
+        return file_name

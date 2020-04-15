@@ -25,25 +25,19 @@ ProtocolErrors = Enum('ProtocolErrors', [
     'NO_RESULTS_FOUND',
     'UNSUPPORTED_COMMAND',
     'INVALID_RESET_CODE',
-    'USER_IS_NOT_ACTIVE'])
+    'USER_IS_NOT_ACTIVE',
+    'INVALID_BASE64_STRING'])
 
 class ProtocolException(Exception):
     def __init__(self, error):
         self._error = error
-
-ServerMethods = Enum('ServerMethods', [
-    'TRANSLATE',
-    'EXCHANGE',
-    'WIKI_SEARCH',
-    'CALCULATE'
-    ], start=100)
 
 ClientMethods = 1
 
 
 server_features_handler_config = {
     'sentence_count': 2, 
-    'path_to_model': 'C:/Users/jdayd/Documents/VoiceAssistant/Server/saved.pt'
+    'path_to_model': 'Server/qa_test/saved.pt'
 }
 
 
@@ -54,6 +48,7 @@ validators_config = {
 
 utils_config = {
     'code_len': 6,
+    'pic_url': 'static/profile_pics',
     'max_seconds': 60 * 30 # 30 Minutes with 60 seconds
 }
 
