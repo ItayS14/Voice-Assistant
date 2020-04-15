@@ -1,60 +1,29 @@
-import wikipedia
-from wikipedia.exceptions import DisambiguationError
-import requests
 from googletrans import Translator
 from py_expression_eval import Parser
 import pycountry
 from fuzzywuzzy import process
-import torch
-from scipy import spatial
-import googlesearch
-from textblob import TextBlob
+from Server.search import QA
 
+
+# The class handles all the features of the server
 class ServerFeaturesHandler:
 	exchange_api_url = r"https://api.exchangerate-api.com/v4/latest/"
 	languages = [country.name for country in pycountry.languages]
 	currencies = dict({currency.name:currency.alpha_3.upper() for currency in pycountry.currencies}, **{'Dollar': 'USD', 'Shekel': 'ILS'})
 
-	def __init__(self, sentence_count, path_to_model):
+	def __init__(self, sentence_count, path_to_infersent, path_to_xgboost):
 		self._sentence_count = sentence_count
-		self._model = torch.load(path_to_model)
-		self._model.eval()
+		self._qa = QA(path_to_infersent, path_to_xgboost)
 		
-	def find_min_cosine_sim(self, question, context):
-		"""
-		The function will get the sentence the most simillar to the question
-		:param question: the question to check (str)
-		:param context: list of sentences to check (list of str)
-		:return: the closest sentence sentence - str
-		"""
-		quest_vec = self._model.encode([question], tokenize=True)[0]
-		context_vec = self._model.encode(context, tokenize=True)
-		distances = (spatial.distance.cosine(sentence, quest_vec) for sentence in context_vec) # Getting the distances
-		return min(zip(context, distances), key= lambda x : x[1])[0]
-
-	@staticmethod
-	def get_context(keywords):
-		"""
-		This function will get the context for the question to answer
-		:param keywords: the question that has been asked by the user - only the keywords part (str)
-		:return: the information related to the question that has been asked (str)
-		"""
-
-		res  = next(googlesearch.search('site:en.wikipedia.org ' + keywords, 'com', 'en'))
-		blob = TextBlob(wikipedia.summary(res[res.rfind('/') + 1:], auto_suggest=False))
-		return [item.raw for item in blob.sentences]
-	
 
 	def search(self, question, keywords):
 		"""
 		The function will search for keyword in wikipedia
 		:param keyword: keyword to search (str)
-		:return: the title of the page and the summary (dictionary)
+		:return: the title of the page and the swummary (dictionary)
 		"""
-		context = ServerFeaturesHandler.get_context(keywords)
-		return self.find_min_cosine_sim(question,context)
+		return self._qa.predict(question, keywords)
 		
-
 	@classmethod
 	def coin_exchange(cls,from_coin, to_coin, amount=1):
 		"""
@@ -134,4 +103,4 @@ class ServerFeaturesHandler:
 			lang = 'zh-CN'
 		return lang
 
-		
+

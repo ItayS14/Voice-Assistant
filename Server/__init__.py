@@ -5,7 +5,6 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from enum import Enum
-from Server.server_features import ServerFeaturesHandler
 import spacy
 
 app = Flask(__name__)
@@ -14,12 +13,13 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 mail = Mail(app)
-server_features_handler = ServerFeaturesHandler(**server_features_handler_config)
 nlp = spacy.load('en_core_web_sm')
 
 from Server.validators import Validators
 from Server.utils import Utils
+from Server.server_features import ServerFeaturesHandler
 
+server_features_handler = ServerFeaturesHandler(**server_features_handler_config)
 utils = Utils(**utils_config)
 validators_handler = Validators(**validators_config)
 
