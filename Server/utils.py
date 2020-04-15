@@ -5,7 +5,7 @@ from Server import mail, db, app
 from Server.db_models import User
 import datetime
 from Server.config import ProtocolErrors
-from flask import request, jsonify
+from flask import request, jsonify, url_for
 from functools import wraps
 from flask_login import login_required, current_user
 import os
@@ -68,7 +68,7 @@ class Utils:
         :param user: The user to send the mail to (User)
         """
         token = user.get_token('EMAIL_VALIDATION')
-        url = f'http://localhost:5000/validate_email/{token}'
+        url =  url_for('validate_email', token=token, _external=True) 
         title = f'Hey {user.username}, thanks for signing up to our application'
         body = f'''In order to start using our application you must click on the link below in order to activate your account:
         {url}

@@ -29,7 +29,7 @@ def register(username, email, password):
 
 
 @app.route('/validate_email/<token>')
-def validate_email_token(token):
+def validate_email(token):
     user = User.verify_token(token, 'EMAIL_VALIDATION')
     if not user:
         return jsonify([False, ProtocolErrors.INVALID_EMAIL.value]) 

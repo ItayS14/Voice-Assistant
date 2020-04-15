@@ -4,17 +4,21 @@ import base64
 
 def main():
 	test = Session()   
-	#print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
+	# print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
 	print('Login: ', test.login('abc', 'asfdF123123411'))
-	print('update img:', test.update_picture('sadf.txt'))
+	#print('update img:', test.update_picture('sadf.txt'))
 	#print('Profile: ', test.profile())
 	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
 	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
 	#print('New password: ', test.new_password('eyJ1c2VyX2lkIjoxfQ.XmAwMg.552pVgu2_gg4x0mpWj4rd_tbhjw','Aa1234567'))
 	#print('Calculate:', test.calculate('5 + 5'))
 	#print('Translate:', test.translate('Hello world','HE'))
-	print('Search: ', test.search('Who is the author of Game Of Thrones?','game of thrones'))
+	#print('Search: ', test.search('Who is the author of Game Of Thrones?','game of thrones'))
 	#print('Parse: ', test.parse('who is the author of game of thrones?'))
+	print(test.server_features(test.parse('who is the authoer of game of Thrones')))
+	print(test.server_features(test.parse('Exchange 4 euros to shekels')))
+	print(test.server_features(test.parse('Translate hello world to spanish')))
+	print(test.server_features(test.parse('How much is 3 + 3')))
 	print('Logout: ', test.logout())
 
 
@@ -150,9 +154,19 @@ class Session:
 		return self.session.get(self.server_url + f'/search?question={question}&keywords={keywords}').json()
 
 	def parse(self, text):
+		"""
+		Thhe function will parse a query
+		:param text: the string to parse (str)
+		:return: the answer from the parse route in the server (str)
+		"""
 		return self.session.get(self.server_url + f'/parse/{text}').json()
 
 	def update_picture(self, picture_path):
+		"""
+		The function will upload a picture to the server
+		:param picture_path: path to the picture to upload (str)
+		:return: the answer from the update_img route of the server (str)
+		"""
 		with open(picture_path, 'rb') as f:
 			content = f.read()
 		content = base64.b64encode(content).decode('ascii')
@@ -162,5 +176,14 @@ class Session:
 		}
 		return self.session.post(self.server_url + '/update_img', data)
 
+	def server_features(self, server_response):
+		"""
+		The fucntion will go to the route from the server_response
+		:param server_response: response of the server from the parse function
+		:return: result of the command (str)
+		"""
+		if not server_response[0]:
+			return 'Action is not valid' + str(server_response)
+		return self.session.get(server_response[1]['route'], params=server_response[1]['params']).json()
 if __name__ == '__main__':
 	main()

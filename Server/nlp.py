@@ -1,6 +1,7 @@
 from Server import nlp
 from Server.config import NLPSettings as Settings, ProtocolErrors, ServerMethods, ClientMethods, ProtocolException
 from spacy.matcher import Matcher
+from flask import url_for
 
 
 def parse(text):
@@ -11,6 +12,7 @@ def parse(text):
 	"""
 	doc = nlp(text) # Maybe disable some pipes later
 	first_token = doc[0].lower_
+	print(first_token)
 	if doc[-1].text == '?' or first_token in Settings.wh_dict.keys():
 		return (globals()[Settings.wh_dict[first_token]], doc)
 	if first_token == 'how':
@@ -35,14 +37,14 @@ def nlp_search(doc):
 		r = [span.text for span in doc.noun_chunks] # In case that the sentence had no auxilary verbs grouping all noun chunks except the first one
 		text = ' '.join(r[1:])
 	params = {'keywords': text,'question': str(doc)}
-	return {'route': ServerMethods.WIKI_SEARCH.value, 'params': params}
+	return {'route': url_for('search', _external=True), 'params': params}
 
 
-def nlp_coin_exchange(doc): #TODO: return currency code
+def nlp_coin_exchange(doc): 
 	"""
 	The function will parse exchange query and return the parameters found
 	:param doc: the query to parse (as Spacy doc)
-	:return: dictionary dictionary that contains the parameters (from_coin, to_coin, _amoun) 
+	:return: dictionary dictionary that contains the parameters (from_coin, to_coin, amount) 
 	"""
 	from_c = amount = to_c = None
 	for noun in doc.noun_chunks: #root of the noun chunks will be always the currency
@@ -56,7 +58,7 @@ def nlp_coin_exchange(doc): #TODO: return currency code
 		raise ProtocolException(ProtocolErrors.INVALID_PARAMETERS)
 
 	params = dict(from_coin=from_c, to_coin=to_c, amount=amount) #ERROR: Somtimes from and to coin are not in the correct order
-	return {'route': ServerMethods.EXCHANGE.value, 'params' : params}
+	return {'route': url_for('exchange', _external=True), 'params' : params}
 
 
 def nlp_translate(doc):
@@ -88,7 +90,7 @@ def nlp_translate(doc):
 	# The text is everything between the first verb (tranlate, say etc) and the language to translate to, and everything after the language name - one of them will be an empty string
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}
-	return {'route': ServerMethods.TRANSLATE.value,'params' : params }
+	return {'route': url_for('translate', _external=True),'params' : params }
 
 def nlp_calculate(doc):
 	"""
@@ -106,7 +108,7 @@ def nlp_calculate(doc):
 	# For example, it will work on 'calculate 5 + 5 + 5'
 	start, end = matcher(doc)[0][1], matcher(doc)[-1][2]
 	expression = str(doc[start:end])
-	return {'route': ServerMethods.CALCULATE.value, 'params': {'expression': expression}}
+	return {'route': url_for('calculate', _external=True), 'params': {'expression': expression}}
 	
 
 def determine_how_func(doc):
