@@ -1,109 +1,189 @@
 import requests
 import json
-
-SERVER_URL = 'http://localhost:5000'
-
+import base64
 
 def main():
-    s = requests.Session()
-
-    print('Login: ', login(s, 'abc', 'asfdF123123411').text)
-    #print('Register: ',register(s,'abc','asfdF123123411','jday.david.2002@gmail.com').text)
-    #print('Request: ', request_reset_password(s,'jday.david.2002@gmail.com').text)
-    #print('Reset: ', reset_password(s,'eyJ1c2VyX2lkIjoxfQ.XeqPBw.ZODG4SO9kGiQ8acGbptsAX3cOEU','212456724716714256471asdf78aA'))
-    #print('Logout: ', logout(s))
-    # with open("out.txt",'w+') as f:
-    #     f.write('Translate: '+ translate(s,"What's up?",'HE'))
-    print('Profile: ', profile(s,'abc'))
-
-
-def register(s, username, password, email):
-    """
-    The function will register to the server
-    :param s: The requests session (requests.Session)
-    :return: requests.Response
-    """
-    register_data = {
-        'username': username,
-        'password': password,
-        'email': email
-    }
-
-    return s.post(SERVER_URL + '/register', register_data)
+	test = Session()   
+	# print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
+	print('Login: ', test.login('abc', 'asfdF123123411'))
+	#print('update img:', test.update_picture('sadf.txt'))
+	#print('Profile: ', test.profile())
+	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
+	#print('Password reset code', test.password_reset('Q5239L','jday.david.2002@gmail.com'))
+	#print('New password: ', test.new_password('eyJ1c2VyX2lkIjoxfQ.XmAwMg.552pVgu2_gg4x0mpWj4rd_tbhjw','Aa1234567'))
+	#print('Calculate:', test.calculate('5 + 5'))
+	#print('Translate:', test.translate('Hello world','HE'))
+	#print('Search: ', test.search('Who is the author of Game Of Thrones?','game of thrones'))
+	#print('Parse: ', test.parse('who is the author of game of thrones?'))
+	print(test.server_features(test.parse('who is the authoer of game of Thrones')))
+	print(test.server_features(test.parse('Exchange 4 euros to shekels')))
+	print(test.server_features(test.parse('Translate hello world to spanish')))
+	print(test.server_features(test.parse('How much is 3 + 3')))
+	print('Logout: ', test.logout())
 
 
-def login(s, auth, password):
-    """
-    The function will login to the server
-    :param s: The requests session (requests.Session)
-    :return: requests.Response
-    """
-    login_data = {
-        'auth': auth,
-        'password': password,
-    }
+class Session:
+	def __init__(self, server_url = r'http://localhost:5000'):
+		self.session = requests.Session()
+		self.server_url = server_url
 
-    return s.post(SERVER_URL + '/login', login_data)
+	def register(self, username, password, email):
+		"""
+		The function will register to the server
+		:param username: username to register (str)
+		:param password: password to register (str)
+		:param email: email to register (str)
+		:return: requests.Response
+		"""
+		register_data = {
+			'username': username,
+			'password': password,
+			'email': email
+		}
+		return self.session.post(self.server_url + '/register', register_data).json()
+
+	def login(self, auth, password):
+		"""
+		The function will login to the server
+		:param auth: email or username (str)
+		:param password: password for the user (str)
+		:return: requests.Response
+		"""
+		login_data = {
+			'auth': auth,
+			'password': password,
+		}
+
+		return self.session.post(self.server_url + '/login', login_data).json()
+
+	def logout(self):
+		"""
+		The function will logout a user from the server
+		:return: requests.Response
+		"""
+		return self.session.get(self.server_url + '/logout').json()
+
+	def translate(self,text,dest_lang):
+		"""
+		This function will translate the text to the destination language
+		:param text: the text to translate
+		:param dest_lang: the language to translate into
+		:return: the translated text (str)
+		"""
+		data = {
+			'text': text,
+			'lang': dest_lang
+		}
+		return  self.session.get(self.server_url + "/translate",params=data).json()
+		
+	def profile(self):
+		"""
+		The function will return a user's profile
+		:return: details about the specific user (dict)
+		"""
+		return self.session.get(self.server_url + '/profile').json()
+
+	def reset_password_request(self, email):
+		"""
+		This function will create a password reset request for a user
+		:param email: the mail to send the code to
+		:return: None
+		"""
+		data = {
+			'email' : email
+		}
+		return self.session.post(self.server_url + '/get_password_reset_token', data).json()
+
+	def password_reset(self, code, email):
+		"""
+		This function sends the given reset code to the server and recieves a token in response
+		:param code: the code the client enters (str)
+		:param email: the email of the user (str)
+		:return: the token given by the server used to authenticate (str)
+		"""
+		data = {
+			'code' : str(code),
+			'email': email
+		}
+		return self.session.post(self.server_url + '/validate_code', data).json()
+
+	def new_password(self, token, password):
+		"""
+		This function will update a user's password using the token he got in the last level
+		:param token: the token to use to authenticate (str)
+		:param password: the new password which the client chose (str)
+		:return: None
+		"""
+		data = {
+			'password': password
+		}
+		return self.session.post(self.server_url + '/new_password/' + token,data).json()
+	
+	def calculate(self, expression):
+		"""
+		This function will calculate the result of a mathematical expression
+		:param expression: the mathematical expression to be calculated (str)
+		:return: the value of the expression (int)
+		"""
+		data = {
+			'expression': expression
+		}
+		return self.session.get(self.server_url + '/calculate',params=data).json()
+	
+	def exchange(self, from_coin, to_coin, amount):
+		"""
+		The function will exchange a coin
+		:param from_coin: the old currency (str)
+		:param to_coin: the currency to change to (str)
+		:param amount: the amount to change (int)
+		"""
+		data = {
+			'from_coin' : from_coin,
+			'to_coin': to_coin,
+			'amount': amount
+		}
+		return self.session.get(self.server_url + '/exchange', params=data).json()
 
 
-def logout(s):
-    """
-    The function will logout a user from the server
-    :param s: The requests session (requests.Session)
-    :return: requests.Response
-    """
-    return s.get(SERVER_URL + '/logout')
+	def search(self, question,keywords):
+		"""
+		This function will search a certain expression in wikipedia
+		:param text: the text to search on wikipedia (str)
+		:return: the answer from wikipedia search about the term (str) 
+		"""
+		return self.session.get(self.server_url + f'/search?question={question}&keywords={keywords}').json()
 
+	def parse(self, text):
+		"""
+		Thhe function will parse a query
+		:param text: the string to parse (str)
+		:return: the answer from the parse route in the server (str)
+		"""
+		return self.session.get(self.server_url + f'/parse/{text}').json()
 
-def request_reset_password(s,email):
-    """
-    This function will ask for a password reset (send an email to the user)
-    :param s: The requests session (requests.Session)
-    :return: requests.response
-    """
-    data = {
-        'email':email
-    }
-    return s.post(SERVER_URL + "/password_reset",data)
+	def update_picture(self, picture_path):
+		"""
+		The function will upload a picture to the server
+		:param picture_path: path to the picture to upload (str)
+		:return: the answer from the update_img route of the server (str)
+		"""
+		with open(picture_path, 'rb') as f:
+			content = f.read()
+		content = base64.b64encode(content).decode('ascii')
+		data =  {
+			'img': content,
+			'file_name': picture_path.split('/')[-1]
+		}
+		return self.session.post(self.server_url + '/update_img', data)
 
-
-def reset_password(s, token, new_password):
-    """
-    This function will reset the password with a token
-    :param s: The requests session (requests.Session)
-    :param token: the validity token (str)
-    :param new_password: the new password to change in the server (str)
-    :return: requests.response
-    """
-    data = {
-        'password': new_password
-    }
-    return s.post(SERVER_URL + "/password_reset/" + token, data)
-
-def translate(s,text,dest_lang):
-    """
-    This function will translate the text to the destination language
-    :param s: The requests session (requests.Session)
-    :param text: the text to translate
-    :param dest_lang: the language to translate into
-    :return: the translated text (str)
-    """
-    data = {
-        'data': text,
-        'dest_lang': dest_lang
-    }
-    translated = s.get(SERVER_URL + "/translate",params=data).text
-    return json.loads(translated)[1] # [0] is True/False, [1] is the text
-    
-def profile(s, username):
-    """
-    The function will return a user's profile
-    :param s: The requests session (requests.Session)
-    :param username: the name of the user to look for the profile
-    :return: details about the specific user (dict)
-    """
-
-    return json.loads(s.get(SERVER_URL + '/profile/' + username).text)[1]
-
+	def server_features(self, server_response):
+		"""
+		The fucntion will go to the route from the server_response
+		:param server_response: response of the server from the parse function
+		:return: result of the command (str)
+		"""
+		if not server_response[0]:
+			return 'Action is not valid' + str(server_response)
+		return self.session.get(server_response[1]['route'], params=server_response[1]['params']).json()
 if __name__ == '__main__':
-    main()
+	main()

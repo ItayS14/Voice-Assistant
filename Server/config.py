@@ -1,4 +1,6 @@
 import os
+from enum import Enum, auto
+
 
 class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
@@ -9,14 +11,68 @@ class Config:
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
+ProtocolErrors = Enum('ProtocolErrors', [
+    'INVALID_PARAMETERS',
+    'USER_ALREADY_LOGGED',
+    'INVALID_CREDENTIALS',
+    'USER_NOT_LOGGED',
+    'INVALID_PASSWORD',
+    'INVALID_EMAIL',
+    'INVALID_USERNAME',
+    'PARAMETERS_DO_NOT_MATCH_REQUIREMENTS',
+    'INVALID_TOKEN',
+    'INVALID_CURRENCY_CODE',
+    'NO_RESULTS_FOUND',
+    'UNSUPPORTED_COMMAND',
+    'INVALID_RESET_CODE',
+    'USER_IS_NOT_ACTIVE',
+    'INVALID_BASE64_STRING'])
 
-internet_scrappers = {
-    'SENTENCES_COUNT' : 2,
-    'EXCHANGE_API_URL' : r"https://api.exchangerate-api.com/v4/latest/"
+class ProtocolException(Exception):
+    def __init__(self, error):
+        self._error = error
+
+ClientMethods = 1
+
+
+server_features_handler_config = {
+    'sentence_count': 2, 
+    'path_to_infersent': 'Server/QA_Test/models/infersent_trained.pt',
+    'path_to_xgboost': 'Server/QA_test/models/xgb.model'
 }
 
 
-calculator = {
-    'MAX_PASSWORD_LEN': 32,
-    'MIN_PASSWORD_LEN': 8
+validators_config = {
+    'max_password_len': 32,
+    'min_password_len': 8
 }
+
+utils_config = {
+    'code_len': 6,
+    'pic_url': 'static/profile_pics',
+    'max_seconds': 60 * 30 # 30 Minutes with 60 seconds
+}
+
+
+class NLPSettings(): # Settings for the nlp module
+    command_dict = {
+    'exchange': 'nlp_coin_exchange',
+    'translate': 'nlp_translate',
+    'say': 'nlp_translate',
+    'tell': 'nlp_search',
+    'calculate': 'nlp_calculate'    
+    }
+    wh_dict = {
+        'what': 'nlp_search',
+        'who': 'nlp_search',
+        'where': 'nlp_search',
+        'which': 'nlp_search',
+    }
+    how_dict = {
+        'much': 'determine_how_func',
+        'many': 'nlp_coin_exchange', # might change
+        'does': 'nlp_wiki',
+        'do': 'nlp_translate' 
+    }
+    LANGUAGE_PATTERN = [{'LOWER': {'IN': ['to','in']}}, {'ENT_TYPE': {'IN': ['GPE','NORP','LANGUAGE']}}]
+    CALCULATE_PATTERN = [{'POS': 'NUM'}, {'LOWER': {'IN': ['+', '-', '*', '/', '^', '%']}}, {'POS': 'NUM'}]
