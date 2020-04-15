@@ -3,6 +3,7 @@ from py_expression_eval import Parser
 import pycountry
 from fuzzywuzzy import process
 from Server.search import QA
+import requests
 
 
 # The class handles all the features of the server

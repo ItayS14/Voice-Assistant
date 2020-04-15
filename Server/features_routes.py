@@ -4,6 +4,7 @@ from Server.db_models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from Server.config import ProtocolErrors, ProtocolException
 from Server.utils import validate_params, activated_required
+import Server.nlp_parsing
 
 @app.route('/exchange', methods=['GET'])
 @activated_required
