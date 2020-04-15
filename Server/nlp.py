@@ -1,5 +1,5 @@
 from Server import nlp
-from Server.config import NLPSettings as Settings, ProtocolErrors, ServerMethods, ClientMethods, ProtocolException
+from Server.config import NLPSettings as Settings, ProtocolErrors, ClientMethods, ProtocolException
 from spacy.matcher import Matcher
 from flask import url_for
 

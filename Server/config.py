@@ -32,13 +32,6 @@ class ProtocolException(Exception):
     def __init__(self, error):
         self._error = error
 
-ServerMethods = Enum('ServerMethods', [
-    'TRANSLATE',
-    'EXCHANGE',
-    'WIKI_SEARCH',
-    'CALCULATE'
-    ], start=100)
-
 ClientMethods = 1
 
 
