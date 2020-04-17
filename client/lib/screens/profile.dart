@@ -3,21 +3,34 @@ import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/profile_text_box.dart';
 import 'package:client/utils/network.dart';
 
-class ProfileArguments {
-  final String img_url;
-  final String username;
-  final String email;
-
-  ProfileArguments({this.img_url, this.username, this.email});
-}
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final ProfileArguments args = ModalRoute.of(context).settings.arguments;
-    
+  Widget build(BuildContext context) {    
+    return FutureBuilder(
+      future: profile(),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
+            return _onFinished(context, snapshot.data);
+          default:
+            return Align(alignment: Alignment.center, child: CircularProgressIndicator(strokeWidth: 10));
+        }
+      },
+    );
+  }
+
+  _onFinished(context, res) {
+    String username, email, img_url;
+    print(res);
+    if (res[0]) {
+      username = res[1]['username'];
+      email = res[1]['email'];
+      img_url = res[1]['image'];
+    }
+
     return AppTemplate(
       widgets: <Widget>[
         Stack(
@@ -27,7 +40,7 @@ class ProfilePage extends StatelessWidget {
               top: MediaQuery.of(context).size.height * 0.17,
               left: 38,
               child: CircleAvatar(
-                backgroundImage: NetworkImage(args.img_url),
+                backgroundImage: NetworkImage(img_url),
                 radius: 120 // Change this to be fitted to screen size
               )
             ),
@@ -39,17 +52,16 @@ class ProfilePage extends StatelessWidget {
         ),
         ProfileTextBox(
                     header: 'Username',
-                    text: args.username
+                    text: username
                   ),
         SizedBox(height: MediaQuery.of(context).size.height * 0.03),
         ProfileTextBox(
           header: 'Email',
-          text: args.email
+          text: email
         )
       ],
     );
   }
-
   _buildLogoutButton(context){
     return  IconButton(
       iconSize: 30,

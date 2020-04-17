@@ -72,15 +72,10 @@ class LoginPageState extends State<LoginPage> {
   _login() {
     _formKey.currentState.save();
     login(_auth, _password).then((res) {
-      if (res[0]) {
-        profile().then((profileRes) {
-          Navigator.pushNamed(context,
-          '/main',
-          arguments: ProfileArguments(img_url: profileRes[1]['image'], username: profileRes[1]['username'], email: profileRes[1]['email']));
-          });
-      } else {
+      if (res[0])
+          Navigator.pushNamed(context, '/main');
+      else 
         Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
-      }
     });
   }
 
