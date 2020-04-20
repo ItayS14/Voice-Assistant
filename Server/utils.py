@@ -5,7 +5,7 @@ from Server import mail, db, app
 from Server.db_models import User
 import datetime
 from Server.config import ProtocolErrors
-from flask import request, jsonify, url_for
+from flask import request, jsonify, url_for, render_template
 from functools import wraps
 from flask_login import login_required, current_user
 import os
@@ -68,12 +68,12 @@ class Utils:
         :param user: The user to send the mail to (User)
         """
         token = user.get_token('EMAIL_VALIDATION')
-        url =  url_for('validate_email', token=token, _external=True) 
-        title = f'Hey {user.username}, thanks for signing up to our application'
-        body = f'''In order to start using our application you must click on the link below in order to activate your account:
-        {url}
-        '''
-        Utils._send_mail(title, body, user)
+        msg = Message(
+            'Thanks for signing up to our Voice Asistant app',
+            sender = 'noreply@carmelvoiceassistant.com',
+            recipients=[user.email],
+            html=render_template('email_validation.html', token=token, user=user))
+        mail.send(msg)
 
     def verify_code(self, user, code):
         """
