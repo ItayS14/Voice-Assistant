@@ -1,6 +1,9 @@
-import 'package:requests/requests.dart';
+import 'dart:convert';
 
-const SERVER_URL = 'http://10.0.2.2:5000';
+import 'package:requests/requests.dart';
+import 'dart:io';
+
+const SERVER_URL = 'http://10.0.0.24:5000';
 const ROUTES = ['translate', 'exchange', 'search', 'calculate'];
 // The function will login a user to the app
 dynamic login(String auth, String password) async {
@@ -93,6 +96,15 @@ dynamic profile() async {
   return res.json();
 }
 
+dynamic uploadImage(File image) async {
+  final res = await Requests.post('$SERVER_URL/update_img',
+  body: {
+    'file_name': image.path.split('/').last,
+    'img': base64Encode(image.readAsBytesSync())
+  },
+  bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+  return res;
+}
 String encodeMap(Map data) {
   return data.keys.map((key) => "${Uri.encodeComponent(key)}=${Uri.encodeComponent(data[key])}").join("&");
 }

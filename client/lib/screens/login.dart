@@ -7,7 +7,6 @@ import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:client/utils/network.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:client/screens/profile.dart';
 import 'package:client/config.dart';
 
 class LoginPage extends StatefulWidget{
