@@ -13,5 +13,7 @@ const ProtocolErrors = [
   "No results found!",
   "Unsupported command!",
   "Invalid reset code! Try checking the code again.",
-  "User is not active! You can't perform this action when you're not active!"
-];
+  "User is not active! You can't perform this action when you're not active!",
+  "There has been a problem with your uploaded image. Please try again or upload a different image.",
+  "Couldn't reach the server!\nPlease close the app and try again or try again later.",
+  ];

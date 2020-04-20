@@ -7,9 +7,14 @@ import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:client/utils/network.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:client/screens/profile.dart';
 import 'package:client/config.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatefulWidget{
+
+class LoginPage extends StatefulWidget{ 
+
   @override
   LoginPageState createState() => LoginPageState(); 
 }
@@ -18,9 +23,10 @@ class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _rememberMe = true;
   String _auth, _password;
-
+  NetworkHandler _networkHandler = NetworkHandler();
   @override
   Widget build(BuildContext context){
+    // try to login if remember was checked last time
     return AppTemplate(
       widgets: <Widget>[
         SizedBox(height: 60),
@@ -50,7 +56,7 @@ class LoginPageState extends State<LoginPage> {
                 style: GoogleFonts.quicksand(),
                 ),
               onPressed: () {
-               Navigator.pushNamed(context, '/pass_reset');
+               Navigator.pushReplacementNamed(context, '/pass_reset');
              },
              )
         ]),
@@ -62,19 +68,25 @@ class LoginPageState extends State<LoginPage> {
         BottomButton(
           text: "Don't have an account?", 
           buttonText: 'Sign Up',
-          onPressed: () => Navigator.of(context).pushNamed('/register')
+          onPressed: () => Navigator.pushReplacementNamed(context, '/register')
         )
       ]
     );
   }
 
-  _login() {
+  _login() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     _formKey.currentState.save();
-    login(_auth, _password).then((res) {
+
+    _networkHandler.login(_auth, _password).then((res) {
+      prefs.setBool('RememberMe', _rememberMe).then((_){});
       if (res[0])
-          Navigator.pushNamed(context, '/main');
-      else 
+      {
+        Navigator.pushReplacementNamed(context, '/main');
+      }
+      else {
         Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
+      }
     });
   }
 

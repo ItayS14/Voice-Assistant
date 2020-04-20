@@ -20,6 +20,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
   bool _isAvailable = false;
   String _header = "Hello, How can I help you?";
   String _text = "";
+  final NetworkHandler _networkHandler = NetworkHandler();
 
   @override
   void initState(){
@@ -71,7 +72,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
       _speech.listen(onResult: (SpeechRecognitionResult result) {
           _text = "${result.recognizedWords}";
           if(result.finalResult) {
-            parse(_text).then(_onResult);
+            _networkHandler.parse(_text).then(_onResult);
             _header = "Hello, How can I help you?";
             _text = "";
           }
@@ -82,8 +83,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
 
   _onResult(res) {
     if (res[0]) {  // If parsing didn't fail
-      serverMethods(res[1]).then((newRes) {
-        print(newRes);
+      _networkHandler.serverMethods(res[1]).then((newRes) {
         if (newRes[0]) { // If executing one of the commands didn't fail
           _infoAlert(newRes[1]);
         }

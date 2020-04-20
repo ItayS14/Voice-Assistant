@@ -15,6 +15,7 @@ import 'package:client/config.dart';
 class PassResetPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   String email = "";
+  final NetworkHandler _networkHandler = NetworkHandler();
   
   PassResetPage({Key key}) : super(key: key);
 
@@ -52,10 +53,9 @@ class PassResetPage extends StatelessWidget {
   }
   _sendRequest(BuildContext context) {
     _formKey.currentState.save();
-    getPasswordResetToken(email).then((res) {
+    _networkHandler.getPasswordResetToken(email).then((res) {
       if (res[0]) {
-        print('pass reset email $email');
-        Navigator.pushNamed( context,
+        Navigator.pushReplacementNamed(context,
         '/validate_code',
          arguments: CodeScreenArguments(email)
          );

@@ -4,6 +4,8 @@ import 'package:client/custom_widgets/profile_text_box.dart';
 import 'package:client/utils/network.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key key}) : super(key: key);
@@ -14,11 +16,13 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   String username, email, imgUrl;
+  final NetworkHandler _networkHandler = NetworkHandler();
+
 
   @override
   Widget build(BuildContext context) {    
     return FutureBuilder(
-      future: profile(),
+      future: _networkHandler.profile(),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
@@ -31,7 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _onFinished(context, res) {
-    print(res);
     if (res[0]) {
       username = res[1]['username'];
       email = res[1]['email'];
@@ -88,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (croppedFile != null)  // In case that user pressed on return button at any point
       {
         setState(() {
-          uploadImage(croppedFile).then((res) => print(res));    
+          _networkHandler.uploadImage(croppedFile).then((_) {});    
         });
       }
   }
@@ -98,8 +101,9 @@ class _ProfilePageState extends State<ProfilePage> {
       iconSize: 30,
       icon: Icon(Icons.exit_to_app),
       onPressed: () {
-        logout().then((res) {
-          Navigator.of(context).pop(); // Might cause troubles in auto login - check it later
+        SharedPreferences.getInstance().then((instance) => instance.setBool('RememberMe', false));
+        _networkHandler.logout().then((res) {
+          Navigator.pushReplacementNamed(context, '/login'); // Might cause troubles in auto login - check it later
         });
       },
     );

@@ -4,6 +4,8 @@ import 'package:client/custom_widgets/app_button.dart';
 import 'package:client/app_template.dart';
 import 'package:client/custom_widgets/bottom_button.dart';
 import 'package:client/utils/network.dart';
+import 'package:client/config.dart';
+
 
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -17,6 +19,8 @@ class RegisterPage extends StatefulWidget {
 class RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   String _username, _password, _email;
+  final NetworkHandler _networkHandler = NetworkHandler();
+
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +53,12 @@ class RegisterPageState extends State<RegisterPage> {
     _formKey.currentState.save();
     if (_formKey.currentState.validate())
     {
-      register(_username, _password, _email).then((res) {
+      _networkHandler.register(_username, _password, _email).then((res) {
         if (res[0])
-          Navigator.of(context).pop();
+          Navigator.pushReplacementNamed(context, '/login');
         else
-          print('$res');
+          Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
+
       });
     }
   }

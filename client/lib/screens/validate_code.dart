@@ -19,6 +19,8 @@ class ValidateCodePage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final int codeLen = 6;
   String code;
+  final NetworkHandler _networkHandler = NetworkHandler();
+
 
   ValidateCodePage({Key key}) : super(key: key);
 
@@ -32,7 +34,7 @@ class ValidateCodePage extends StatelessWidget {
         child: IconButton(
         icon: Icon(Icons.home),
         onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
+          Navigator.pushReplacementNamed(context, "/login");
         },
         tooltip: 'Go back home',
         color: Colors.teal,
@@ -69,9 +71,9 @@ class ValidateCodePage extends StatelessWidget {
   }
   _sendRequest(BuildContext context, String email) {
     _formKey.currentState.save();
-    validateCode(code,email).then((res) {
+    _networkHandler.validateCode(code,email).then((res) {
       if (res[0]) {
-        Navigator.pushNamed(context,
+        Navigator.pushReplacementNamed(context,
           '/new_password',
           arguments: NewPassScreenArguments(res[1]['token']),
           );
