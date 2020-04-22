@@ -85,7 +85,7 @@ class LoginPageState extends State<LoginPage> {
         Navigator.pushReplacementNamed(context, '/main');
       }
       else {
-        Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Error!", desc: res[1], type: AlertType.error).show(); //For now
       }
     });
   }

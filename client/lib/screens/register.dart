@@ -57,7 +57,7 @@ class RegisterPageState extends State<RegisterPage> {
         if (res[0])
           Navigator.pushReplacementNamed(context, '/login');
         else
-          Alert(context: context, title: "Error!", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
+          Alert(context: context, title: "Error!", desc: res[1], type: AlertType.error).show(); //For now
 
       });
     }

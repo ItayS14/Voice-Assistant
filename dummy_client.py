@@ -5,7 +5,7 @@ import base64
 def main():
 	test = Session()   
 	# print('Register: ', test.register('abc','asfdF123123411','it.shirizly@gmail.com'))
-	print('Login: ', test.login('abc', 'asfdF123123411'))
+	print('Login: ', test.login('def', 'Aa123456'))
 	#print('update img:', test.update_picture('sadf.txt'))
 	#print('Profile: ', test.profile())
 	#print('Password reset Request', test.reset_password_request('jday.david.2002@gmail.com'))
@@ -15,10 +15,11 @@ def main():
 	#print('Translate:', test.translate('Hello world','HE'))
 	#print('Search: ', test.search('Who is the author of Game Of Thrones?','game of thrones'))
 	#print('Parse: ', test.parse('who is the author of game of thrones?'))
-	print(test.server_features(test.parse('who is the authoer of game of Thrones')))
-	print(test.server_features(test.parse('Exchange 4 euros to shekels')))
-	print(test.server_features(test.parse('Translate hello world to spanish')))
-	print(test.server_features(test.parse('How much is 3 + 3')))
+	# print(test.server_features(test.parse('who is the authoer of game of Thrones')))
+	# print(test.server_features(test.parse('Exchange 4 euros to shekels')))
+	# print(test.server_features(test.parse('Translate hello world to spanish')))
+	# print(test.server_features(test.parse('How much is 3 + 3')))
+	print(test.server_features(test.parse('who is djkhjkadskjdfsajkdsfkdjkafdjask')))
 	print('Logout: ', test.logout())
 
 
@@ -184,6 +185,8 @@ class Session:
 		"""
 		if not server_response[0]:
 			return 'Action is not valid' + str(server_response)
-		return self.session.get(server_response[1]['route'], params=server_response[1]['params']).json()
+		return self.session.get(self.server_url + server_response[1]['route'], params=server_response[1]['params']).json()
+
+
 if __name__ == '__main__':
 	main()

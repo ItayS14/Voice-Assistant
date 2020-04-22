@@ -1,73 +1,73 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:client/utils/app_exceptions.dart';
 import 'dart:async';
 import 'package:requests/requests.dart';
 
 
-
+// The class handles all the network activities of the application
 class NetworkHandler {
   static const _serverUrl = 'http://10.0.2.2:5000';
   static final NetworkHandler _networkHandler = NetworkHandler._internal();
 
   NetworkHandler._internal();
-
   
+  // This class is a "singleton", meaning there is only one instance of it, no matter where it's called in the code.
   factory NetworkHandler() {
     return _networkHandler;
   }
-
+  
+  /*
+    This function will send a request to the server
+    Input: the parameters to send in the request, route to go to in the server and get or post request
+    Output: a list representing the response
+  */
   Future<dynamic> _generalRequest(params, route, { isGetRequest = true }) async {
     var responseJson;
     try {
-      if(isGetRequest) {
-        String encodeParams = _encodeMap(params);
-        final response = await Requests.get(_serverUrl +  route + (encodeParams == null ? '' : '?' + _encodeMap(params)));
-        responseJson = _returnResponse(response);
-      }
-      else {
-        final response = await  Requests.post(_serverUrl + route, body: params, bodyEncoding: RequestBodyEncoding.FormURLEncoded);
-        responseJson = _returnResponse(response);
-      }
+      Response response;
+      if(isGetRequest) 
+        response = await Requests.get(_serverUrl +  route + _encodeMap(params));
+      else 
+        response = await  Requests.post(_serverUrl + route, body: params, bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+      response.throwForStatus();
+      responseJson = json.decode(response.content());
     }
-    catch (e)
-    {
-      return [false, 16];
+    on HTTPException catch (e) {
+      return [false, 'HTTP Error, status code: ${e.response.statusCode}'];
+    }
+    catch (e) {
+      return [false, 'General error\nplease close the app and try again.'];
     }
     return responseJson;
   }
-
-  dynamic _returnResponse(Response response) {
-    switch (response.statusCode) {
-      case 200:
-        return json.decode(response.content());
-      case 400:
-        throw BadRequestException(response.toString());
-      case 401:
-      case 403:
-        throw UnauthorisedException(response.toString());
-      case 500:
-      default:
-        throw FetchDataException(
-            'Error occured while Communication with Server with StatusCode : ${response.statusCode}');
-    }
-  }
-
+  
+  /*
+    This function will encode the parameters for the GET request (if there are any)
+    Input: a dictionary of the names and values of the parameters
+    Output: a string representing the names and values of the parameters ("?key1=value1&key2=value2...")
+  */
   String _encodeMap(Map data) {
-    return data == null ? null : data.keys.map((key) => "${Uri.encodeComponent(key)}=${Uri.encodeComponent(data[key])}").join("&");
+    return data == null ? '' : '?' + data.keys.map((key) => "${Uri.encodeComponent(key)}=${Uri.encodeComponent(data[key])}").join("&");
   }
 
-  dynamic parse(String query) async {
-    return  _generalRequest(null, '/parse/$query');
+  // The function will call the /parse route in the server and will return its response
+  Future<dynamic> parse(String query) async {
+    return _generalRequest(null, '/parse/$query');
   } 
-
-  dynamic serverMethods(Map<String, dynamic> params) async {
+  
+  /*
+    This function will call any of the server methods (for example, translate or calculate) and will return the response
+    Input: a dictionary containing the route to call in the server and parameters to pass to that route
+    Output: the response from the server to the request
+  */
+  Future<dynamic> serverMethods(Map<String, dynamic> params) async {
     String route = params['route'];
     var body = params['params'];
-    return  _generalRequest(body, route);
+    return _generalRequest(body, route);
   } 
 
-  dynamic login(String auth, String password) async {
+  // The function will perform a login for the user to the app with its credentials 
+  Future<dynamic> login(String auth, String password) async {
     var params =  {
       'auth': auth, 
       'password': password
@@ -77,57 +77,65 @@ class NetworkHandler {
   }
 
   // The function will logout the user from the app
-  dynamic logout() async {
+  Future<dynamic> logout() async {
     return  _generalRequest(null, '/logout');
   }
 
   // The function will register a user to the application
-  dynamic register(String username, String password, String email) async {
+  Future<dynamic> register(String username, String password, String email) async {
     var params =  {
       'username': username, 
       'password': password,
       'email': email
     };
     var res =  _generalRequest(params, '/register', isGetRequest: false);
-    //if(res[0])
-      //Requests.clearStoredCookies(Requests.getHostname(_serverUrl));
     return res;
   }
 
-  dynamic getPasswordResetToken(String email) async {
+  // The function will request the server to send a reset token to an email
+  Future<dynamic> getPasswordResetToken(String email) async {
     var params = {
       'email': email
     };
     return _generalRequest(params, '/get_password_reset_token',isGetRequest: false);
   }
 
-  dynamic validateCode(String code, String email) async {
+  // The function will send a requesst to the server to validate the code
+  Future<dynamic> validateCode(String code, String email) async {
     var params = {
       'code': code,
       'email': email
     };
-    return await _generalRequest(params, '/validate_code',isGetRequest: false);
+    return _generalRequest(params, '/validate_code',isGetRequest: false);
   }
 
-  dynamic newPasswordRequest(String token, String password) async {
+  // The function will update the password stored for a user
+  Future<dynamic> newPasswordRequest(String token, String password) async {
     var params = {
       'password': password,
     };
-    return await _generalRequest(params, '/new_password',isGetRequest: false);
-    return await _generalRequest(params, '/new_password/$token',isGetRequest: false);
+    return _generalRequest(params, '/new_password/$token',isGetRequest: false);
   }
 
-  dynamic profile() async {
-    return await _generalRequest(null, '/profile');
+  // The function will call the profile route in the server and will return its response 
+  // The response contains the name, email and image of the user
+  Future<dynamic> profile() async {
+    return _generalRequest(null, '/profile');
   }
   
-  dynamic uploadImage(File image) async {
+  /*
+    This function will upload an image to the server
+    input: File image - the image file to upload
+    output: Future<dynamic> - result from the server 
+  */
+  Future<dynamic> uploadImage(File image) async {
     var params =  {
       'file_name': image.path.split('/').last,
-      'img': base64Encode(image.readAsBytesSync())
+      'img': base64Encode(image.readAsBytesSync()) // The server need the img to be encoded as base64
     };
-    return await _generalRequest(params, '/update_img', isGetRequest: false);
+    return _generalRequest(params, '/update_img', isGetRequest: false);
   }
 
+  // The function will clear the cookies stored in the shared preferences
   void deleteCookies() => Requests.clearStoredCookies(Requests.getHostname(_serverUrl));
 }
