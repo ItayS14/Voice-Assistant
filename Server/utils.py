@@ -9,6 +9,7 @@ from flask import request, jsonify, url_for, render_template
 from functools import wraps
 from flask_login import login_required, current_user
 import os
+import uuid
 
 
 def validate_params(*params, get):
@@ -20,6 +21,7 @@ def validate_params(*params, get):
     def _validate_params(fnc):
         @wraps(fnc)
         def wrapper(*args, **kwargs):
+            print('decorator running')
             params_to_fnc = [request.args.get(param) if get else request.form.get(param) for param in params]
             if None in params_to_fnc:
                 return jsonify([False, ProtocolErrors.INVALID_PARAMETERS])
@@ -133,8 +135,14 @@ class Utils:
         :return: file name of the saved picture
         """
         _, ext = os.path.splitext(file_name)
-        file_name = current_user.username + ext
-        path = os.path.join(app.root_path, self._pic_url, file_name)
+        new_file_name = str(uuid.uuid1()) + ext
+
+        # Removing old picture from the server to save space
+        if current_user.profile_image != 'default.jpg': 
+            os.remove(os.path.join(app.root_path, self._pic_url, current_user.profile_image))
+
+        print('Saving', new_file_name)
+        path = os.path.join(app.root_path, self._pic_url, new_file_name)
         with open(path, 'wb') as f:
             f.write(content)
-        return file_name
+        return new_file_name
