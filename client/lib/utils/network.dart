@@ -114,6 +114,7 @@ class NetworkHandler {
       'password': password,
     };
     return await _generalRequest(params, '/new_password',isGetRequest: false);
+    return await _generalRequest(params, '/new_password/$token',isGetRequest: false);
   }
 
   dynamic profile() async {

@@ -42,7 +42,7 @@ class RegisterPageState extends State<RegisterPage> {
         BottomButton(
           text: "Already have an account?",
           buttonText: "Login",
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
         )
       ]
     );

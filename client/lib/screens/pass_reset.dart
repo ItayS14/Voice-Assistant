@@ -46,7 +46,7 @@ class PassResetPage extends StatelessWidget {
         BottomButton(
           text: "Remember your password?",
           buttonText: "Go Back",
-          onPressed: () => Navigator.of(context).pop()
+          onPressed: () => Navigator.pushReplacementNamed(context, '/login')
         )
       ]
     );

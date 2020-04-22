@@ -28,6 +28,7 @@ class NewPasswordPage extends StatelessWidget {
         Align(
         alignment: Alignment.topLeft,      
         child: IconButton(
+        padding: new EdgeInsets.fromLTRB(20,50,0,0), 
         icon: Icon(Icons.home),
         onPressed: () {
           Navigator.pushReplacementNamed(context, "/login");
