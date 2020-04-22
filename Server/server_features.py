@@ -42,13 +42,13 @@ class ServerFeaturesHandler:
 		if not response.ok: #if there was error in the resonse (if from_coin was not valid)
 			raise ValueError('Invalid currency code')
 		data = response.json()
-
+	
 		to_coin = to_coin.upper() 
 		if "result" in data.keys() or to_coin not in data["rates"].keys(): #invalid from_coin or to_coin
 			raise ValueError('Invalid currency code')
 		
 		rate = data["rates"][to_coin]
-		return rate * amount
+		return round(rate * amount, 4)
 
 	@classmethod
 	def translate(cls, text, dest_lang):

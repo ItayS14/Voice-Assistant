@@ -8,7 +8,7 @@ import Server.nlp_parsing
 
 @app.route('/exchange', methods=['GET'])
 @activated_required
-@validate_params('amount', 'to_coin', 'from_coin', get=True)
+@validate_params('amount', 'from_coin', 'to_coin', get=True)
 def exchange(amount, from_coin, to_coin):
     try:
         result = server_features_handler.coin_exchange(from_coin, to_coin, float(amount))

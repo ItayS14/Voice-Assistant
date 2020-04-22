@@ -2,6 +2,7 @@ from Server import nlp
 from Server.config import NLPSettings as Settings, ProtocolErrors, ProtocolException
 from spacy.matcher import Matcher
 from flask import url_for
+import re
 
 
 def parse(text):
@@ -10,6 +11,7 @@ def parse(text):
 	:param text: the text to parse (str)
 	:return: tuple - (doc, function)
 	"""
+	text = re.sub(r'\$(\d+)', r'\1 Dollars', text) # Change special case of $
 	doc = nlp(text) # Maybe disable some pipes later
 	first_token = doc[0].lower_
 	if doc[-1].text == '?' or first_token in Settings.wh_dict.keys():
@@ -48,7 +50,8 @@ def nlp_coin_exchange(doc):
 	"""
 	from_c = amount = to_c = None
 	for noun in doc.noun_chunks: #root of the noun chunks will be always the currency
-		if noun.root.i > 0 and doc[noun.root.i - 1].pos_ == 'NUM': # if there was a number before the currency it indicates that that's the part to exchange
+		print(noun, noun.root.text)
+		if noun.root.i > 0 and doc[noun.root.i - 1].pos_ == 'NUM': # if there was a number before the currency it indicates that that's the part to exchange		
 			from_c = noun.root.text
 			amount = doc[noun.root.i - 1].text
 		else:
