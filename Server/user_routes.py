@@ -98,7 +98,7 @@ def validate_code(code, email):
     
 @app.route('/new_password/<token>',methods=['POST'])
 @validate_params('password', get=False)
-def new_password(token, new_password):
+def new_password(new_password, token):
     # May need to add support for password change later
     if current_user.is_authenticated:
         return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])

@@ -37,7 +37,7 @@ def nlp_search(doc):
 		r = [span.text for span in doc.noun_chunks] # In case that the sentence had no auxilary verbs grouping all noun chunks except the first one
 		text = ' '.join(r[1:])
 	params = {'keywords': text,'question': str(doc)}
-	return {'route': url_for('search', _external=True), 'params': params}
+	return {'route': url_for('search'), 'params': params}
 
 
 def nlp_coin_exchange(doc): 
@@ -58,7 +58,7 @@ def nlp_coin_exchange(doc):
 		raise ProtocolException(ProtocolErrors.INVALID_PARAMETERS)
 
 	params = dict(from_coin=from_c, to_coin=to_c, amount=amount) #ERROR: Somtimes from and to coin are not in the correct order
-	return {'route': url_for('exchange', _external=True), 'params' : params}
+	return {'route': url_for('exchange'), 'params' : params}
 
 
 def nlp_translate(doc):
@@ -90,7 +90,7 @@ def nlp_translate(doc):
 	# The text is everything between the first verb (tranlate, say etc) and the language to translate to, and everything after the language name - one of them will be an empty string
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}
-	return {'route': url_for('translate', _external=True),'params' : params }
+	return {'route': url_for('translate'),'params' : params }
 
 def nlp_calculate(doc):
 	"""
@@ -108,7 +108,7 @@ def nlp_calculate(doc):
 	# For example, it will work on 'calculate 5 + 5 + 5'
 	start, end = matcher(doc)[0][1], matcher(doc)[-1][2]
 	expression = str(doc[start:end])
-	return {'route': url_for('calculate', _external=True), 'params': {'expression': expression}}
+	return {'route': url_for('calculate'), 'params': {'expression': expression}}
 	
 
 def determine_how_func(doc):
