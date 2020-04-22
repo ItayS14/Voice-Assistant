@@ -29,6 +29,9 @@ dependencies:
   speech_to_text: ^0.8.0 
   flutter_tts: 
   google_fonts: ^0.3.10
+  image_picker: ^0.6.5
+  image_cropper: ^1.2.1
+
 
 dev_dependencies:
   flutter_test:

@@ -16,6 +16,7 @@ class NewPassScreenArguments {
 class NewPasswordPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   String newPassword;
+  NetworkHandler _networkHandler = NetworkHandler();
   
   NewPasswordPage({Key key}) : super(key: key);
 
@@ -27,9 +28,10 @@ class NewPasswordPage extends StatelessWidget {
         Align(
         alignment: Alignment.topLeft,      
         child: IconButton(
+        padding: new EdgeInsets.fromLTRB(20,50,0,0), 
         icon: Icon(Icons.home),
         onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
+          Navigator.pushReplacementNamed(context, "/login");
         },
         tooltip: 'Go back home',
         color: Colors.teal,
@@ -66,11 +68,10 @@ class NewPasswordPage extends StatelessWidget {
   }
   _sendRequest(BuildContext context, String token) {
     _formKey.currentState.save();
-    newPasswordRequest(token,newPassword).then((res) {
+    _networkHandler.newPasswordRequest(token,newPassword).then((res) {
       if (res[0]) {
-        print(res);
         Alert(context: context, title: "Success", desc: 'You have successfully reset your password. You are now being sent to the login page.', type: AlertType.success).show(); //For now    
-        Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
+        Navigator.pushReplacementNamed(context, "/login");
       } else {
         Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
       }
