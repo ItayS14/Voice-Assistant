@@ -39,7 +39,7 @@ class Validators:
         :param password: the password to check (str)
         :return: does the password fit the standards or not (bool)
         """
-        if not (self._min_password_len < len(password) < self._max_password_len):
+        if not (self._min_password_len <= len(password) <= self._max_password_len):
             return False
         lower = any(char.islower() for char in password)
         upper = any(char.isupper() for char in password)

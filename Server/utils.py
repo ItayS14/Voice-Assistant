@@ -22,7 +22,7 @@ def validate_params(*params, get):
         def wrapper(*args, **kwargs):
             params_to_fnc = [request.args.get(param) if get else request.form.get(param) for param in params]
             if None in params_to_fnc:
-                return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+                return jsonify([False, ProtocolErrors.INVALID_PARAMETERS])
             return fnc(*params_to_fnc, **kwargs)
         return wrapper
     return _validate_params
@@ -36,7 +36,7 @@ def activated_required(fnc):
     @wraps(fnc)
     def wrapper(*args, **kwargs):
         if not current_user.confirmed:
-            return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE.value])
+            return jsonify([False, ProtocolErrors.USER_IS_NOT_ACTIVE])
         return fnc(*args, **kwargs)
     return wrapper
 

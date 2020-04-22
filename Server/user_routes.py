@@ -11,14 +11,14 @@ import binascii
 @validate_params('username', 'email', 'password', get=False)
 def register(username, email, password):
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED])
 
     if not validators_handler.username(username):
-        return jsonify([False, ProtocolErrors.INVALID_USERNAME.value]) 
+        return jsonify([False, ProtocolErrors.INVALID_USERNAME]) 
     if not validators_handler.email(email):
-        return jsonify([False, ProtocolErrors.INVALID_EMAIL.value])
+        return jsonify([False, ProtocolErrors.INVALID_EMAIL])
     if not validators_handler.password(password):
-        return jsonify([False, ProtocolErrors.INVALID_PASSWORD.value]) 
+        return jsonify([False, ProtocolErrors.INVALID_PASSWORD]) 
 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     user = User(username=username, email=email, password=hashed_password)
@@ -32,7 +32,7 @@ def register(username, email, password):
 def validate_email(token):
     user = User.verify_token(token, 'EMAIL_VALIDATION')
     if not user:
-        return jsonify([False, ProtocolErrors.INVALID_EMAIL.value]) 
+        return jsonify([False, ProtocolErrors.INVALID_TOKEN]) 
     user.confirmed = True
     db.session.commit()
     return "Email is now validated!"
@@ -41,7 +41,7 @@ def validate_email(token):
 @validate_params('auth', 'password', get=False)
 def login(auth, password):
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED])
     # Checking for both options (username validation or email validation)
     user = User.query.filter_by(email=auth).first()
     if not user:
@@ -52,7 +52,7 @@ def login(auth, password):
         login_user(user)  # Not sure how to use the remember argument
         return jsonify([True, {}])
 
-    return jsonify([False, ProtocolErrors.INVALID_CREDENTIALS.value])
+    return jsonify([False, ProtocolErrors.INVALID_CREDENTIALS])
 
 
 @app.route('/logout')
@@ -68,29 +68,30 @@ def logout():
 def get_password_reset_token(email):
     # May need to add support for password change later
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED])
     
     user = User.query.filter_by(email=email).first()
     if user is None:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+        return jsonify([False, ProtocolErrors.NOT_EXISTING_EMAIL])
   
-    utils.send_reset_email(user)
-    
+   # utils.send_reset_email(user)
+    utils._generate_random_code(user)
+    print('Code:', user.reset_code)
     return jsonify([True, {}])
 
 @app.route('/validate_code', methods=['POST'])
 @validate_params('code', 'email', get=False)
 def validate_code(code, email):
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED])
 
     # Used for creating a token
     user = User.query.filter_by(email=email).first()
     if user is None:
-        return jsonify([False, ProtocolErrors.INVALID_PARAMETERS.value])
+        return jsonify([False, ProtocolErrors.NOT_EXISTING_EMAIL])
     
     if not utils.verify_code(user,code):
-        return jsonify([False, ProtocolErrors.INVALID_RESET_CODE.value])
+        return jsonify([False, ProtocolErrors.INVALID_RESET_CODE])
 
     token = user.get_token('PASSWORD_RESET')
     return jsonify([True, {'token' : str(token)}])
@@ -101,11 +102,11 @@ def validate_code(code, email):
 def new_password(new_password, token):
     # May need to add support for password change later
     if current_user.is_authenticated:
-        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED.value])
+        return jsonify([False, ProtocolErrors.USER_ALREADY_LOGGED])
 
     user = User.verify_token(token, 'PASSWORD_RESET')
     if user is None:
-        return jsonify([False, ProtocolErrors.INVALID_TOKEN.value])
+        return jsonify([False, ProtocolErrors.INVALID_TOKEN])
 
     # Make sure that password is strong enough and create new hash
     if validators_handler.password(new_password):
@@ -114,7 +115,7 @@ def new_password(new_password, token):
         db.session.commit()
         return jsonify([True, {}])
         
-    return jsonify([False, ProtocolErrors.INVALID_PASSWORD.value])
+    return jsonify([False, ProtocolErrors.INVALID_PASSWORD])
     
 
 @app.route('/profile', methods=['GET'])
@@ -141,7 +142,7 @@ def update_img(file_name, img):
     try:
         raw_data = base64.b64decode(img)
     except binascii.Error: 
-        return jsonify[False, ProtocolErrors.INVALID_BASE64_STRING.value]
+        return jsonify[False, ProtocolErrors.INVALID_BASE64_STRING]
     else:
         file_name = utils.save_picture(file_name, raw_data)
         current_user.profile_image = file_name

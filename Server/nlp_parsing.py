@@ -1,5 +1,5 @@
 from Server import nlp
-from Server.config import NLPSettings as Settings, ProtocolErrors, ClientMethods, ProtocolException
+from Server.config import NLPSettings as Settings, ProtocolErrors, ProtocolException
 from spacy.matcher import Matcher
 from flask import url_for
 
@@ -12,7 +12,6 @@ def parse(text):
 	"""
 	doc = nlp(text) # Maybe disable some pipes later
 	first_token = doc[0].lower_
-	print(first_token)
 	if doc[-1].text == '?' or first_token in Settings.wh_dict.keys():
 		return (globals()[Settings.wh_dict[first_token]], doc)
 	if first_token == 'how':
@@ -20,6 +19,7 @@ def parse(text):
 	# Checking if the first word is a VERB might not work
 	if first_token not in Settings.command_dict.keys():
 		raise ProtocolException(ProtocolErrors.UNSUPPORTED_COMMAND)
+	
 	return (globals()[Settings.command_dict[first_token]], doc)
 
 
@@ -85,8 +85,9 @@ def nlp_translate(doc):
 		if token.pos_ == 'VERB':
 			first_verb = token.i
 			break
+		
 	if first_verb is None:
-		raise ProtocolException(ProtocolErrors.PARAMETERS_DO_NOT_MATCH_REQUIREMENTS)
+		raise ProtocolException(ProtocolErrors.UNSUPPORTED_COMMAND)
 	# The text is everything between the first verb (tranlate, say etc) and the language to translate to, and everything after the language name - one of them will be an empty string
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}

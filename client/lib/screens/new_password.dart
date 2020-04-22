@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:client/config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +10,12 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:client/utils/network.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// CupertinoActivityIndicator
+// Struct for this screen's arguments
 class NewPassScreenArguments {
   final String token;
   NewPassScreenArguments(this.token);
 }
+
 class NewPasswordPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   String newPassword;
@@ -66,14 +69,23 @@ class NewPasswordPage extends StatelessWidget {
       ]
     );
   }
+  /*
+  This function will send the new password request to the server
+  Input: context and the token receieved in the last step (validate code)
+  Output: none (alerts the user if there's an error)
+  */
   _sendRequest(BuildContext context, String token) {
     _formKey.currentState.save();
     _networkHandler.newPasswordRequest(token,newPassword).then((res) {
       if (res[0]) {
-        Alert(context: context, title: "Success", desc: 'You have successfully reset your password. You are now being sent to the login page.', type: AlertType.success).show(); //For now    
-        Navigator.pushReplacementNamed(context, "/login");
+        Alert(
+          context: context, 
+          title: "Success", 
+          desc: 'You have successfully reset your password. You are now being sent to the login page.', 
+          type: AlertType.success,
+        ).show().then((_) => Navigator.pushReplacementNamed(context, "/login")); //For now    
       } else {
-        Alert(context: context, title: "Server Error", desc: ProtocolErrors[res[1]], type: AlertType.error).show(); //For now
+        Alert(context: context, title: "Server Error", desc: res[1], type: AlertType.error).show(); 
       }
     });
   }
