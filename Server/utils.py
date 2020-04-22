@@ -5,7 +5,7 @@ from Server import mail, db, app
 from Server.db_models import User
 import datetime
 from Server.config import ProtocolErrors
-from flask import request, jsonify, url_for
+from flask import request, jsonify, url_for, render_template
 from functools import wraps
 from flask_login import login_required, current_user
 import os
@@ -54,12 +54,13 @@ class Utils:
         The function will send reset email to user
         :param user: The user to send the maill to (User class)
         """
-        code = self._generate_random_code(user)
-        title = f'Your Password Reset Code is - {code}'
-        body = f'''To reset your password, please enter the following code: {code}, in the application screen in front of you.
-    If you did not make this request then simply ignore this email and no changes will be made.
-    '''
-        Utils._send_mail(title, body, user)
+        self._generate_random_code(user)
+        Utils._send_mail(
+            'Here is your reset password code', 
+            'otp_template.html',
+            user.email, 
+            user=user
+        )
 
     @staticmethod
     def send_email_verification(user):
@@ -67,13 +68,13 @@ class Utils:
         The function will send email validation toeen to usre
         :param user: The user to send the mail to (User)
         """
-        token = user.get_token('EMAIL_VALIDATION')
-        url =  url_for('validate_email', token=token, _external=True) 
-        title = f'Hey {user.username}, thanks for signing up to our application'
-        body = f'''In order to start using our application you must click on the link below in order to activate your account:
-        {url}
-        '''
-        Utils._send_mail(title, body, user)
+        Utils._send_mail(
+            'Thanks for signing up to our Voice Asistant app',
+            'email_validation.html',
+            user.email,
+            token= user.get_token('EMAIL_VALIDATION'),
+            user= user
+        )
 
     def verify_code(self, user, code):
         """
@@ -98,7 +99,6 @@ class Utils:
         """
         This function will generate the random code which the client will enter in the application and will add it to the codes dict
         :param user: the user to add the code to, in the codes dict (User)
-        :return: a code to be sent to the user (str)
         """
         code = ''.join(random.sample(Utils.chars_for_code, self._code_len))
         # Even if there already exists a code for the client, a new one is generated
@@ -106,22 +106,23 @@ class Utils:
         time = datetime.datetime.now().timestamp()
         user.updated_time = time
         db.session.commit()
-        return code
 
     @staticmethod
-    def _send_mail(subject, body, user):
+    def _send_mail(subject, html, to, **kwargs):
         """
         This function will send a mail to a user with a specified body and title
         :param subject: the title of the mail to be sent (str)
-        :param body: the body/message of the mail to be sent (str)
-        :param user: the user to send the mail to (User)
-        :return: None
+        :param html: the path to the html file to render (str)
+        :param to: the recipient (str)
+        :param **kwargs: any keyword argument
         """
+        print(kwargs['user'])
         msg = Message(
             subject,
             sender = 'noreply@carmelvoiceassistant.com',
-            recipients=[user.email],
-            body=body)
+            recipients=[to],
+            html = render_template(html, **kwargs)
+        )
         mail.send(msg)
 
     def save_picture(self, file_name, content):
