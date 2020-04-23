@@ -51,8 +51,9 @@ def calculate(expression):
         return jsonify([True, res])
 
 
-@app.route('/parse/<text>', methods=['GET'])
+@app.route('/parse', methods=['GET'])
 @activated_required
+@validate_params('text', get=True)
 def parse(text):
     try:
         res = Server.nlp_parsing.parse(text)

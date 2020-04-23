@@ -54,8 +54,14 @@ class RegisterPageState extends State<RegisterPage> {
     if (_formKey.currentState.validate())
     {
       _networkHandler.register(_username, _password, _email).then((res) {
-        if (res[0])
-          Navigator.pushReplacementNamed(context, '/login');
+        if (res[0]) { 
+          Alert(
+            context: context, 
+            title: "Success", 
+            desc: 'You have successfully registered, please validate your email', 
+            type: AlertType.success,
+          ).show().then((_) => Navigator.pushReplacementNamed(context, "/login")); 
+        }
         else
           Alert(context: context, title: "Error!", desc: res[1], type: AlertType.error).show(); //For now
 

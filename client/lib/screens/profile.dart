@@ -90,9 +90,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ) : null;
       if (croppedFile != null)  // In case that user pressed on return button at any point
       {
-        setState(() {
-          _networkHandler.uploadImage(croppedFile).then((_) {});    
-        });
+        await _networkHandler.uploadImage(croppedFile);
+        setState(() {});
       }
   }
 

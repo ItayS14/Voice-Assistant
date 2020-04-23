@@ -100,7 +100,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
 
   _errorAlert(msg){
     Alert(context: context, title: 'Error', desc: msg, type: AlertType.error).show();
-    _tts.speak('Sorry, that command is not supported');
+    _tts.speak(msg);
   }
 
   _infoAlert(text){

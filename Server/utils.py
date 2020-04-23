@@ -21,7 +21,6 @@ def validate_params(*params, get):
     def _validate_params(fnc):
         @wraps(fnc)
         def wrapper(*args, **kwargs):
-            print('decorator running')
             params_to_fnc = [request.args.get(param) if get else request.form.get(param) for param in params]
             if None in params_to_fnc:
                 return jsonify([False, ProtocolErrors.INVALID_PARAMETERS])

@@ -6,7 +6,7 @@ import 'package:requests/requests.dart';
 
 // The class handles all the network activities of the application
 class NetworkHandler {
-  static const _serverUrl = 'http://10.0.2.2:5000';
+  static const _serverUrl = 'http://10.0.0.24:5000';
   static final NetworkHandler _networkHandler = NetworkHandler._internal();
 
   NetworkHandler._internal();
@@ -24,11 +24,12 @@ class NetworkHandler {
   Future<dynamic> _generalRequest(params, route, { isGetRequest = true }) async {
     var responseJson;
     try {
+      print(params);
       Response response;
       if(isGetRequest) 
-        response = await Requests.get(_serverUrl +  route + _encodeMap(params));
+        response = await Requests.get(_serverUrl +  route + _encodeMap(params), timeoutSeconds: 30);
       else 
-        response = await  Requests.post(_serverUrl + route, body: params, bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+        response = await  Requests.post(_serverUrl + route, body: params, bodyEncoding: RequestBodyEncoding.FormURLEncoded, timeoutSeconds: 30);
       response.throwForStatus();
       responseJson = json.decode(response.content());
     }
@@ -36,6 +37,7 @@ class NetworkHandler {
       return [false, 'HTTP Error, status code: ${e.response.statusCode}'];
     }
     catch (e) {
+      print(e);
       return [false, 'General error\nplease close the app and try again.'];
     }
     return responseJson;
@@ -52,7 +54,7 @@ class NetworkHandler {
 
   // The function will call the /parse route in the server and will return its response
   Future<dynamic> parse(String query) async {
-    return _generalRequest(null, '/parse/$query');
+    return _generalRequest({'text' : query}, '/parse');
   } 
   
   /*
