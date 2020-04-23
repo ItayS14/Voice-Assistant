@@ -82,15 +82,17 @@ def nlp_translate(doc):
 
 	# doc[start:end] creates a span - of which we take the second word ('in Hebrew', 'to English' etc)
 	lang = doc[start:end][1]
-
 	first_verb = None
 	for token in doc:
 		if token.pos_ == 'VERB':
 			first_verb = token.i
 			break
-		
+
 	if first_verb is None:
-		raise ProtocolException(ProtocolErrors.UNSUPPORTED_COMMAND)
+		if doc[0].text.lower() in ['translate','say']:
+			first_verb = 0
+		else: 
+			raise ProtocolException(ProtocolErrors.UNSUPPORTED_COMMAND)
 	# The text is everything between the first verb (tranlate, say etc) and the language to translate to, and everything after the language name - one of them will be an empty string
 	translate_text =  doc[first_verb+1:start].text + doc[end:].text 
 	params = {'lang': lang.text, 'text': translate_text}

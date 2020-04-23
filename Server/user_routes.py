@@ -74,9 +74,7 @@ def get_password_reset_token(email):
     if user is None:
         return jsonify([False, ProtocolErrors.NOT_EXISTING_EMAIL])
   
-   # utils.send_reset_email(user)
-    utils._generate_random_code(user)
-    print('Code:', user.reset_code)
+    utils.send_reset_email(user)
     return jsonify([True, {}])
 
 @app.route('/validate_code', methods=['POST'])

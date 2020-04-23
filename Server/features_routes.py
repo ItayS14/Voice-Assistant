@@ -48,7 +48,7 @@ def calculate(expression):
     except Exception:
         return jsonify([False,ProtocolErrors.INVALID_PARAMETERS])
     else:
-        return jsonify([True, {}])
+        return jsonify([True, res])
 
 
 @app.route('/parse/<text>', methods=['GET'])
