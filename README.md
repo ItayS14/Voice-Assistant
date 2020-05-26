@@ -26,5 +26,5 @@ Please make sure the server is running and the _serverUrl variable inside main.d
 
 #### Login system:
 
-![register](screenshots\register.png) ![login](screenshots/login.png)
+![register](screenshots/register.png) ![login](screenshots/login.png)
 
