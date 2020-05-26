@@ -20,6 +20,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
   bool _isAvailable = false;
   String _header = "Hello, How can I help you?";
   String _text = "";
+  bool _finished = false;
   final NetworkHandler _networkHandler = NetworkHandler();
 
   @override
@@ -67,11 +68,15 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
 
   _startListening() {
     _header = "I'm listening...";
+    _finished = false;
     setState(() {});
     if (_isAvailable) {
       _speech.listen(onResult: (SpeechRecognitionResult result) {
+          if (_finished)
+            return;
           _text = "${result.recognizedWords}";
           if(result.finalResult) {
+            _finished = true;
             _networkHandler.parse(_text).then(_onResult);
             _header = "Hello, How can I help you?";
             _text = "";
@@ -104,7 +109,7 @@ class _SpeechRecognitionScreenState extends State<SpeechRecognitionScreen> {
   }
 
   _infoAlert(text){
-    Alert(context: context, title: 'Result', desc: '$text', type: AlertType.info).show();
+    Alert(context: context, title: 'Result', desc: '$text', type: AlertType.info).show().then((_) =>_tts.stop());
     _tts.speak('$text');
   }
 }
